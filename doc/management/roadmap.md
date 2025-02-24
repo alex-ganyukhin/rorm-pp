@@ -2,7 +2,7 @@
 
 ## 2025-Q1-Q2: Setup and PoC
 
-**Timeline**: Jan-Jul 2025
+**Timeline**: Feb-Jul 2025
 
 ### Goals
 
@@ -16,7 +16,7 @@
 
 ### Milestones & Deliverables
 
-- [ ] The project is set up
+- [ ] [Set up the compiler](./milestones/clang_with_reflection_setup.md)
 - [ ] The library can analyze a class/struct
 - [ ] The library can serialize/deserialize to/from JSON
 
@@ -36,7 +36,6 @@
 ### Milestones
 - [ ] The architecture is designed
 - [ ] CRUD operations are implemented
-
 
 ---
 
