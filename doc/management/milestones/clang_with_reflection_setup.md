@@ -17,21 +17,22 @@
 ---
 
 ## Tasks
-- [ ] Build clang, libc++ with C++26 reflection enabled
-- [ ] Setup cmake project to use the built clang
+- [x] Build clang, libc++ with C++26 reflection enabled
+- [x] Setup cmake project to use the built clang
 - [ ] Create minimal working example of reflection
 - [ ] Include google tests
 
 ---
 
 ## Problems
-### Example Problem 1
-- Description of the solved problem 1
-- Additional details...
+### Built clang compiler is requires a lot of additional "moves" to build & run
+1. LD_LIBRARY_PATH is required to run the built -> have to use rpath instead
 
-### [SOLVED] Example Problem 2
-- Description of the solved problem 2
-- Additional details...
+### Cannot use the installed clang, only the one from "build" directory
+- ...
+
+### Code analyzer warns about reflection things
+
 
 ---
 

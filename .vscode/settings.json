@@ -20,5 +20,12 @@
         "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.",
         "See the License for the specific language governing permissions and",
         "limitations under the License."
-    ]
+    ],
+    "C_Cpp.codeAnalysis.clangTidy.path": "/home/alex/work/personal/rorm/clang-p2996/build/bin/clang-tidy",
+    "files.associations": {
+        "*.sql": "sql",
+        "meta": "cpp"
+    },
+    "C_Cpp.clang_format_path": "/home/alex/work/personal/rorm/clang-p2996/build/bin/clang-format",
+    "C_Cpp.errorSquiggles": "disabled"
 }

@@ -12,4 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.25)
+
+if (NOT "${COMPILER_DIR}" STREQUAL "")
+    set(CMAKE_C_COMPILER "${COMPILER_DIR}/bin/clang")
+    set(CMAKE_CXX_COMPILER "${COMPILER_DIR}/bin/clang++")
+endif()
+
+MESSAGE(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
+MESSAGE(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
+
+project(rorm)
+
+set(CMAKE_CXX_STANDARD 26)
+
+add_executable(
+    rorm-test
+    test/test_reflection.cc
+)
+
+target_compile_options(rorm-test PUBLIC -Wall -Wextra -Werror) # fixme -> separate script
+target_compile_options(rorm-test PUBLIC -freflection-latest -stdlib=libc++ )
+target_link_options(rorm-test PUBLIC -lc++abi -lc++)

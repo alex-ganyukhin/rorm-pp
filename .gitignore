@@ -5,3 +5,6 @@ build-release/
 
 # Env files
 .env
+
+# settings for editors
+.vscode
