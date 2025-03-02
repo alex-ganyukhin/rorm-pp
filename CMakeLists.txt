@@ -22,15 +22,25 @@ endif()
 MESSAGE(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 MESSAGE(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
 
-project(rorm)
 
 set(CMAKE_CXX_STANDARD 26)
 
-add_executable(
-    rorm-test
-    test/test_reflection.cc
-)
 
-target_compile_options(rorm-test PUBLIC -Wall -Wextra -Werror) # fixme -> separate script
-target_compile_options(rorm-test PUBLIC -freflection-latest -stdlib=libc++ )
-target_link_options(rorm-test PUBLIC -lc++abi -lc++)
+add_compile_options(-Wall -Wextra -Werror -Wno-unknown-attributes -fno-access-contexts)
+add_compile_options(-freflection-latest -stdlib=libc++ )
+add_link_options(-lc++abi -lc++)
+
+
+# Fixme: better implementation, move to a separate file
+list(APPEND CMAKE_BUILD_RPATH "${COMPILER_DIR}/lib/x86_64-unknown-linux-gnu")
+
+enable_testing()
+include(3rd_party/google_test/install_google_test.cmake)
+
+
+project(rorm)
+
+
+
+
+add_subdirectory(tests)

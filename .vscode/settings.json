@@ -24,7 +24,8 @@
     "C_Cpp.codeAnalysis.clangTidy.path": "/home/alex/work/personal/rorm/clang-p2996/build/bin/clang-tidy",
     "files.associations": {
         "*.sql": "sql",
-        "meta": "cpp"
+        "meta": "cpp",
+        "string": "cpp"
     },
     "C_Cpp.clang_format_path": "/home/alex/work/personal/rorm/clang-p2996/build/bin/clang-format",
     "C_Cpp.errorSquiggles": "disabled"

@@ -14,11 +14,12 @@
 - Given a class/struct defined by user, the library should be able to serialize/deserialized it to/from JSON.
 
 
-### Milestones & Deliverables
+### Milestones
 
 - [ ] [Set up the compiler](./milestones/clang_with_reflection_setup.md)
 - [ ] The library can analyze a class/struct
 - [ ] The library can serialize/deserialize to/from JSON
+
 
 ---
 

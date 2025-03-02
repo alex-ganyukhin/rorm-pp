@@ -1,7 +1,5 @@
 # Building directories
-build/
-build-debug/
-build-release/
+build*/
 
 # Env files
 .env

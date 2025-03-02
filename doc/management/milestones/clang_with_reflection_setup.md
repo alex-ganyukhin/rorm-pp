@@ -19,8 +19,10 @@
 ## Tasks
 - [x] Build clang, libc++ with C++26 reflection enabled
 - [x] Setup cmake project to use the built clang
-- [ ] Create minimal working example of reflection
-- [ ] Include google tests
+- [x] Create minimal working example of reflection
+- [x] Include google tests
+- [ ] Document
+- [ ] Grand cleanup of library and cmake files
 
 ---
 
