@@ -27,14 +27,14 @@ The library is licensed under the Apache License, Version 2.0. Please see [LICEN
 ## Prerequisites
 - `CMake 3.25` or higher
 - Compiler, supporting P2996 reflection proposal
-  - **Warning**: ATM only [Bloomberg's Clang](./doc/development/bloomber_clang_setup.md) is supported.
+  - **Warning**: ATM only [Bloomberg's Clang](./doc/development/bloomberg_clang_setup.md) is supported.
 
 ## Building
 1. **Precondition**: [Prerequisites](#prerequisites) are installed.
 2. `mkdir build-debug && cd build-debug`
 3. `cmake -G Ninja -DCOMPILER_DIR=/abs/path/to/bloomberg/clang/build -DCMAKE_BUILD_TYPE=Debug ..`
 4. `ninja`
-5. `LD_LIBRARY_PATH=/abs/path/to/bloomberg/clang/build/lib/x86_64-unknown-linux-gnu ./tests/rorm_test`
+5. `./tests/rorm_test`
 
 
 ## Testing

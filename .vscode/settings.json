@@ -25,7 +25,11 @@
     "files.associations": {
         "*.sql": "sql",
         "meta": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp"
     },
     "C_Cpp.clang_format_path": "/home/alex/work/personal/rorm/clang-p2996/build/bin/clang-format",
     "C_Cpp.errorSquiggles": "disabled"
