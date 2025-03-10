@@ -1,7 +1,7 @@
 # Milestone: Setup Clang with Reflection
 
 - **Timeline**: Feb-Mar 2025
-- **Status**: Ongoing
+- **Status**: Done
 
 ---
 
@@ -22,7 +22,7 @@
 - [x] Create minimal working example of reflection
 - [x] Include google tests
 - [x] Document
-- [ ] Grand cleanup of library and cmake files
+- [x] Grand cleanup of library and cmake files
 
 ---
 

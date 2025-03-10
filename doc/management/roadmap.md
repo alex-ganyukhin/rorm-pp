@@ -1,12 +1,13 @@
 # Project roadmap
 
-## 2025-Q1-Q2: Setup and PoC
+## 2025-Q1-Q2: Setup and Model
 
 **Timeline**: Feb-Jul 2025
 
 ### Goals
 
 - Setup the project
+- Design the architecture of the solution
 - Given a class/struct defined by user, the library should be able to analyze it
   - What member fields are?
   - What attributes of the members are? (e.g. `[[orm::column("name")]]`)
@@ -16,9 +17,8 @@
 
 ### Milestones
 
-- [ ] [Set up the compiler](./milestones/clang_with_reflection_setup.md)
-- [ ] The library can analyze a class/struct
-- [ ] The library can serialize/deserialize to/from JSON
+- [x] [Set up the compiler](./milestones/000_clang_with_reflection_setup.md)
+- [ ] [Model to handle JSON](./milestones/001_the_first_steps.md)
 
 
 ---
@@ -28,15 +28,12 @@
 **Timeline**: Aug-Dec 2025
 
 ### Goals
-- Design the architecture of the solution
 - Implement basic ORM capabilities
-  - CRUD operations
-  - Basic queries
-  - Relationships are planned for future releases
+  - Basic and simple CRUD operations
+  - *Relationships* are planned for future releases
 
 ### Milestones
-- [ ] The architecture is designed
-- [ ] CRUD operations are implemented
+- [ ] [Simple ORM](./milestones/002_simple_orm.md)
 
 ---
 

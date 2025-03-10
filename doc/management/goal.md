@@ -1,0 +1,11 @@
+# rorm - Goal
+- **Automatic Reflection-Based Mapping**
+- **Automatic Query Generation**
+- **Relations Support**
+- **No Macros**
+- **Allow customizations**
+  - E.g. via annotations
+- **Transactions**
+- **API for integration with various databases**
+- **Schema migrations**
+- **Performance**

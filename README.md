@@ -3,7 +3,7 @@ C++26 **R**eflection based **O**bject **R**elational **M**apping for C++
 
 ## About
 As it can be understood from the name, the library provides ORM capabilities based purely on C++26 built-in reflection.
-
+[The goal/purpose of the project](./doc/management/goal.md)
 
 ## Contribution Guidelines
 - Please follow the coding style specified in [coding_style.md](./doc/development/coding_style.md).
