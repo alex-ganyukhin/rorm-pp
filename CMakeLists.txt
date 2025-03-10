@@ -14,6 +14,9 @@
 
 cmake_minimum_required(VERSION 3.25)
 
+
+
+# FIXME: Remove this workaround.
 if (NOT "${COMPILER_DIR}" STREQUAL "")
     set(CMAKE_C_COMPILER "${COMPILER_DIR}/bin/clang")
     set(CMAKE_CXX_COMPILER "${COMPILER_DIR}/bin/clang++")
@@ -23,24 +26,30 @@ MESSAGE(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
 MESSAGE(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
 
 
-set(CMAKE_CXX_STANDARD 26)
-
-
-add_compile_options(-Wall -Wextra -Werror -Wno-unknown-attributes -fno-access-contexts)
-add_compile_options(-freflection-latest -stdlib=libc++ )
-add_link_options(-lc++abi -lc++)
-
-
-# Fixme: better implementation, move to a separate file
-list(APPEND CMAKE_BUILD_RPATH "${COMPILER_DIR}/lib/x86_64-unknown-linux-gnu")
-
-enable_testing()
-include(3rd_party/google_test/install_google_test.cmake)
-
 
 project(rorm)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+include(compiler)
+
+# 3rd Party
+include(3rd_party/google_test/install_google_test.cmake)
 
 
+add_library(
+    ${PROJECT_NAME}
+    INTERFACE
+)
+target_include_directories(
+    ${PROJECT_NAME}
+    INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/rorm/include
+)
 
+
+###########################
+# Testing
+###########################
+enable_testing()
 add_subdirectory(tests)

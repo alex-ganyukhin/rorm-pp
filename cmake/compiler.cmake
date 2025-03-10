@@ -12,28 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 cmake_minimum_required(VERSION 3.25)
 
-enable_testing()
 
-project(rorm_test)
 
-add_executable(
-    ${PROJECT_NAME}
-    test_reflection.cc
-)
+set(CMAKE_CXX_STANDARD 26)
 
-target_link_libraries(
-    ${PROJECT_NAME}
-    GTest::gtest_main
-    rorm
-)
 
-include(GoogleTest)
+add_compile_options(-Wall -Wextra -Werror -Wno-unknown-attributes -fno-access-contexts)
+add_compile_options(-freflection-latest -stdlib=libc++ )
+add_link_options(-lc++abi -lc++)
 
-# fixme
-# - put in common, separate script
-# - consider better options
-target_compile_options(${PROJECT_NAME} PUBLIC -Wall -Wextra -Werror -Wno-unknown-attributes -fno-access-contexts)
-target_compile_options(${PROJECT_NAME} PUBLIC -freflection-latest -stdlib=libc++ )
-target_link_options(${PROJECT_NAME} PUBLIC -lc++abi -lc++ -v)
+
+# Fixme: better implementation, move to a separate file
+list(APPEND CMAKE_BUILD_RPATH "${COMPILER_DIR}/lib/x86_64-unknown-linux-gnu")
