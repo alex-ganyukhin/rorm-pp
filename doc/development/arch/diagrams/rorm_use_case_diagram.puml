@@ -1,0 +1,64 @@
+@startuml rorm_use_case_diagram
+
+left to right direction
+
+
+skinparam usecase {
+BackgroundColor<< Initial >> PaleGreen
+BorderColor<< Initial >> PaleGreen
+
+BackgroundColor<< Full >> GreenYellow
+BorderColor<< Full >> GreenYellow
+
+BackgroundColor<< Extended >> LightBlue
+BorderColor<< Extended >> LightBlue
+}
+
+
+
+actor "User of the library" as usr
+
+rectangle "Model" {
+    (Wants to serialize and deserialize objects) as (serialization) << Initial >>
+
+
+    ' Formats of the serialization
+    (Different formats) as (formats)
+
+    (JSON serialization) << Initial >>
+    (Custom) << Full >>
+    (GPB) << Extended >>
+
+    (formats) <|-- (JSON serialization) << Initial >>
+    (formats) <|-- (Custom)
+    (formats) <|-- (GPB)
+
+    (serialization) ..> (formats) : <<includes>>
+    (serialization) ..> (validation) : <<includes>>
+    (serialization) ..> (Natively works with C++26) : <<includes>>
+    (serialization) ..> (Define serialization rules for external objects) : <<includes>>
+
+
+    ' extract
+    (extract_model) <|-- (JSON schema)
+    (extract_model) <|-- (Openapi)
+    (extract_model) <|-- (User-defined)
+    (extract_model) <|-- (GPB Definitions)
+
+
+    (Wants to extract defined model to other formats) as (extract_model) <<Extended>>
+    (Wants to validate the data) as (validation) <<Extended>>
+}
+
+rectangle "ORM" {
+    (TODO)
+}
+
+
+:usr: -- (serialization)
+:usr: -- (extract_model)
+:usr: -- (validation)
+
+:usr: -- (TODO)
+
+@enduml
