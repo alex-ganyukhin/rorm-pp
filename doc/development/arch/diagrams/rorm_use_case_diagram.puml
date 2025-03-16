@@ -1,5 +1,11 @@
 @startuml rorm_use_case_diagram
 
+title
+RORM++
+Basic use cases diagram
+end title
+
+
 left to right direction
 
 
@@ -33,10 +39,34 @@ rectangle "Model" {
     (formats) <|-- (Custom)
     (formats) <|-- (GPB)
 
+    ' Serialization of types
+    (Serialization of enum as string or int) as (serialize_enum) << Initial >>
+    (Strings) as (string) <<Initial>>
+    (Integers) as (int) <<Initial>>
+    (Doubles/floating points) as (double) <<Initial>>
+    (Boolean) as (bool) <<Initial>>
+    (Optional/none) as (optional) <<Initial>>
+    (Sequence container) as (sequence_container) <<Initial>>
+    (Associative container) as (associative_container) <<Full>>
+
+
+    (Serialization of different types) as (types) << Initial >>
+    (types) ..> (serialize_enum) : <<includes>>
+    (types) ..> (string) : <<includes>>
+    (types) ..> (int) : <<includes>>
+    (types) ..> (double) : <<includes>>
+    (types) ..> (bool) : <<includes>>
+    (types) ..> (optional) : <<includes>>
+    (types) ..> (sequence_container) : <<includes>>
+    (types) ..> (associative_container) : <<includes>>
+
+
     (serialization) ..> (formats) : <<includes>>
     (serialization) ..> (validation) : <<includes>>
     (serialization) ..> (Natively works with C++26) : <<includes>>
     (serialization) ..> (Define serialization rules for external objects) : <<includes>>
+    (serialization) <.. (Serialization/Deserialization for external data types, not under user's control) : <<extends>>
+    (serialization) ..> (types) : <<includes>>
 
 
     ' extract
@@ -51,7 +81,30 @@ rectangle "Model" {
 }
 
 rectangle "ORM" {
-    (TODO)
+    (Wants to store and retrieve objects to and from database like) as (orm_store_and_retrieve) << Initial >>
+
+    (Automatic queries) as (auto_queries) << Initial >>
+    (Relations) << Full >>
+    (Atomicity - Transactions) as (atomic) << Full >>
+    (Different data sources) as (data_sources) << Initial >>
+
+
+    (PostgreSQL) << Initial >>
+    (Open API) << Full >>
+    (MySQL) << Full >>
+    (SQLite) << Full >>
+    (NoSQL, not relational) << Full >>
+
+    (data_sources) <|-- (PostgreSQL) << Initial >>
+    (data_sources) <|-- (Open API) << Full >>
+    (data_sources) <|-- (MySQL) << Full >>
+    (data_sources) <|-- (SQLite) << Full >>
+    (data_sources) <|-- (NoSQL, not relational) << Full >>
+
+    (orm_store_and_retrieve) ..> (auto_queries) : <<includes>>
+    (orm_store_and_retrieve) ..> (Relations) : <<includes>>
+    (orm_store_and_retrieve) ..> (atomic) : <<includes>>
+    (orm_store_and_retrieve) ..> (data_sources) : <<includes>>
 }
 
 
@@ -59,6 +112,6 @@ rectangle "ORM" {
 :usr: -- (extract_model)
 :usr: -- (validation)
 
-:usr: -- (TODO)
+:usr: -- (orm_store_and_retrieve)
 
 @enduml
