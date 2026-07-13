@@ -1,0 +1,28 @@
+{
+    "name": "rorm-pp (GCC 16.1)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "remoteUser": "developer",
+    "updateRemoteUserUID": true,
+    "postCreateCommand": "bash .devcontainer/post-create.sh",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools"
+            ],
+            "settings": {
+                "C_Cpp.default.compilerPath": "/usr/local/bin/g++",
+                "C_Cpp.clang_format_path": "/usr/bin/clang-format",
+                "cmake.buildDirectory": "${workspaceFolder}/build-devcontainer",
+                "cmake.configureArgs": [
+                    "-DCMAKE_CXX_COMPILER=/usr/local/bin/g++",
+                    "-DCMAKE_BUILD_TYPE=Debug"
+                ],
+                "cmake.configureOnOpen": false,
+                "cmake.generator": "Ninja"
+            }
+        }
+    }
+}

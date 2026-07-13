@@ -1,5 +1,7 @@
 # Milestone: Setup Clang with Reflection
 
+> **Historical:** This completed milestone records the original compiler setup. The active project toolchain is GCC 16.1.
+
 - **Timeline**: Feb-Mar 2025
 - **Status**: Done
 

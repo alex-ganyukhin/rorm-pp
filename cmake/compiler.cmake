@@ -17,13 +17,28 @@ cmake_minimum_required(VERSION 3.25)
 
 
 
-set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-add_compile_options(-Wall -Wextra -Werror -Wno-unknown-attributes -fno-access-contexts)
-add_compile_options(-freflection-latest -stdlib=libc++ )
-add_link_options(-lc++abi -lc++)
+if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    message(FATAL_ERROR "rorm-pp requires GCC 16.1 or newer")
+endif()
+
+if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.1)
+    message(FATAL_ERROR "rorm-pp requires GCC 16.1 or newer; found ${CMAKE_CXX_COMPILER_VERSION}")
+endif()
 
 
-# Fixme: better implementation, move to a separate file
-list(APPEND CMAKE_BUILD_RPATH "${COMPILER_DIR}/lib/x86_64-unknown-linux-gnu")
+add_library(rorm_compiler_options INTERFACE)
+target_compile_features(rorm_compiler_options INTERFACE cxx_std_26)
+target_compile_options(rorm_compiler_options INTERFACE -freflection)
+
+
+add_library(rorm_warnings INTERFACE)
+target_compile_options(
+    rorm_warnings
+    INTERFACE
+    -Wall
+    -Wextra
+    -Werror
+)

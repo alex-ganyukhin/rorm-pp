@@ -17,7 +17,7 @@
 
 ### Milestones
 
-- [x] [Set up the compiler](./milestones/000_clang_with_reflection_setup.md)
+- [x] [Set up the original Clang reflection compiler (historical)](./milestones/000_clang_with_reflection_setup.md)
 - [ ] [Model to handle JSON](./milestones/001_the_first_steps.md)
 
 

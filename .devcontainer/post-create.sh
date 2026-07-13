@@ -1,4 +1,6 @@
-# Copyright 2025 Aleksandr Ganiukhin
+#!/usr/bin/env bash
+
+# Copyright 2026 Aleksandr Ganiukhin
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,25 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-cmake_minimum_required(VERSION 3.25)
+set -euo pipefail
 
-enable_testing()
+readonly REPOSITORY_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly SMOKE_SOURCE="${REPOSITORY_ROOT}/.devcontainer/reflection-smoke.cc"
+readonly SMOKE_OBJECT="/tmp/rorm-pp-reflection-smoke.o"
 
-project(rorm_test)
+g++ --version
 
-add_executable(
-    ${PROJECT_NAME}
-    test_reflection.cc
-)
-
-target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
-    GTest::gtest_main
-    rorm
-    rorm_warnings
-)
-
-include(GoogleTest)
-
-gtest_discover_tests(${PROJECT_NAME})
+g++ \
+    -std=c++26 \
+    -freflection \
+    -Wall \
+    -Wextra \
+    -Werror \
+    -c "${SMOKE_SOURCE}" \
+    -o "${SMOKE_OBJECT}"

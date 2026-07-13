@@ -14,20 +14,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-
-
-# FIXME: Remove this workaround.
-if (NOT "${COMPILER_DIR}" STREQUAL "")
-    set(CMAKE_C_COMPILER "${COMPILER_DIR}/bin/clang")
-    set(CMAKE_CXX_COMPILER "${COMPILER_DIR}/bin/clang++")
-endif()
-
-MESSAGE(STATUS "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER}")
-MESSAGE(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
-
-
-
-project(rorm)
+project(rorm LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -45,6 +32,11 @@ target_include_directories(
     ${PROJECT_NAME}
     INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/rorm/include
+)
+target_link_libraries(
+    ${PROJECT_NAME}
+    INTERFACE
+    rorm_compiler_options
 )
 
 

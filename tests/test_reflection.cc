@@ -21,24 +21,18 @@
  * @brief
  */
 
-#include "rorm/expand.h"
-
 // 3pp
 #include <gtest/gtest.h>
 
 // STL
-#include <experimental/meta>
 #include <iostream>
-#include <ranges>
+#include <meta>
 #include <string>
-#include <string_view>
 
 using namespace std::string_literals;
-using namespace std::string_view_literals;
-
 struct As
 {
-    char const* value;
+    char value[6];
 };
 
 struct S
@@ -53,14 +47,22 @@ void serialize_to_ostream( std::ostream& out, T const& obj )
 {
     out << "{";
 
-    [:expand( std::meta::nonstatic_data_members_of( ^^T ) ):] >> [&]<auto e> {
-        std::string_view name = std::meta::identifier_of( e );
-        [:expand( std::meta::annotations_of( e ) ):] >> [&]<std::meta::info ann> {
-            name = extract<[:std::meta::type_of( ann ):]>( ann ).value;
-        };
+    static constexpr auto members = std::define_static_array(
+            std::meta::nonstatic_data_members_of( ^^T, std::meta::access_context::current() ) );
 
-        out << "\"" << name << "\": \"" << obj.[:e:] << "\", ";
-    };
+    template for ( constexpr auto member : members )
+    {
+        std::string           name { std::meta::identifier_of( member ) };
+        static constexpr auto annotations = std::define_static_array( std::meta::annotations_of( member ) );
+
+        template for ( constexpr auto annotation : annotations )
+        {
+            constexpr auto column = std::meta::extract<As>( annotation );
+            name                  = column.value;
+        }
+
+        out << "\"" << name << "\": \"" << obj.[:member:] << "\", ";
+    }
 
     out << "}";
 }
