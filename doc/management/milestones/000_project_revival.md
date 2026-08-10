@@ -11,7 +11,8 @@ Re-establish a trustworthy project baseline and the development systems needed t
 - [x] Replace the dated goals, terminology, roadmap, and active milestone set.
 - [x] Retain the GCC 16.1 development container and independent standard-reflection smoke check.
 - [ ] Establish Linux continuous integration for the reflection smoke check, project build, and tests.
-- [ ] Establish Doxygen coverage, line coverage, and branch coverage measurement.
+- [x] Establish Doxygen coverage, line coverage, and branch coverage measurement.
+  - **Discarded**: Scripts and other things is too much for MVP phase. Requirement stays, but no automated way to measure it yet.
 - [ ] Establish repeatable benchmark infrastructure without setting a performance target.
 - [ ] Set up a repository AI-development harness based on [Spec Kit](https://github.com/github/spec-kit).
 

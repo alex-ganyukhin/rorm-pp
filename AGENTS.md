@@ -33,4 +33,13 @@ CMake fetches GoogleTest during configuration. Do not edit or commit generated b
 - Add the repository's Apache-2.0 copyright header to new source, CMake, and script files; see `doc/development/coding_style.md`.
 - Keep changes focused and avoid unrelated edits, especially in generated `build*` directories.
 
-Before handing off, compile the standalone reflection smoke example, build the project, and run the full CTest suite. If GCC 16.1 or the container is unavailable, state that validation limitation explicitly.
+## Healthy project checklist
+
+- [ ] The standalone reflection smoke example compiles with the supported GCC toolchain.
+- [ ] The project configures and builds with `-Wall -Wextra -Werror` clean.
+- [ ] The complete CTest suite passes.
+- [ ] Behavior changes have GoogleTest coverage for successful and relevant failure paths.
+- [ ] Public API changes have Doxygen documentation.
+- [ ] Changed C++ files conform to `.clang-format`.
+- [ ] Skipped, failed, or unavailable checks are recorded accurately; unrun checks are not
+      reported as passing.
