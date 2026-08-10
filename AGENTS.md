@@ -1,4 +1,4 @@
-# Repository guide
+#Repository guide
 
 ## Project
 
@@ -35,11 +35,8 @@ CMake fetches GoogleTest during configuration. Do not edit or commit generated b
 
 ## Healthy project checklist
 
-- [ ] The standalone reflection smoke example compiles with the supported GCC toolchain.
-- [ ] The project configures and builds with `-Wall -Wextra -Werror` clean.
-- [ ] The complete CTest suite passes.
-- [ ] Behavior changes have GoogleTest coverage for successful and relevant failure paths.
-- [ ] Public API changes have Doxygen documentation.
-- [ ] Changed C++ files conform to `.clang-format`.
-- [ ] Skipped, failed, or unavailable checks are recorded accurately; unrun checks are not
-      reported as passing.
+- [ ] Changed files are formatted via `clang-format`
+- [ ] Code coverage is above 95% for lines and branches
+- [ ] All public APIs are documented with Doxygen, except obvious things like plain getters and setters
+- [ ] No failed tests
+- [ ] No build warnings or errors

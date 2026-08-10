@@ -1,4 +1,4 @@
-# rorm-pp
+#rorm - pp
 C++26 **R**eflection based **O**bject **R**elational **M**apping for C++
 
 ## About
@@ -67,6 +67,18 @@ Run all registered tests from a configured build directory:
 ```shell
 ctest --test-dir build-debug --output-on-failure
 ```
+
+## Benchmarking
+Benchmarks use [Google Benchmark](https://github.com/google/benchmark) and are disabled by default. Configure a separate Release build and
+enable them explicitly:
+
+```shell
+cmake -S . -B build-benchmark -G Ninja -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release -DRORM_BUILD_BENCHMARKS=ON
+cmake --build build-benchmark --target rorm_benchmark --parallel
+./build-benchmark/benchmarks/rorm_benchmark
+```
+
+Add benchmarks to `benchmarks/benchmark_dummy.cc`, or replace that dummy source when the first real benchmark is introduced.
 
 
 ## Footer

@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Project foundation
+  - Spec-kit
+  - Dev container
+  - CMake build system
+  - Benchmarking harness
+  - Testing harness
+  - Quality gates
+
 ### Fixed
 
 ### Changed
