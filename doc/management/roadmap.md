@@ -1,42 +1,56 @@
 # Project roadmap
 
-## 2025-Q1-Q2: Setup and Model
+This roadmap orders work by capability rather than by date or estimated effort. It describes the scope of the current target, release `0.1.0`; future ideas remain intentionally unordered until they become current work.
 
-**Timeline**: Feb-Jul 2025
+The [2025 roadmap and milestones](./archive/2025/roadmap.md) are retained as project history.
 
-### Goals
+## Release 0.1.0
 
-- Setup the project
-- Design the architecture of the solution
-- Given a class/struct defined by user, the library should be able to analyze it
-  - What member fields are?
-  - What attributes of the members are? (e.g. `[[orm::column("name")]]`)
-  - Can custom attributes be used at all, are they visible?
-- Given a class/struct defined by user, the library should be able to serialize/deserialized it to/from JSON.
+`0.1.0` is an early-adopter release for Linux with GCC 16.1 or newer. The product must remain portable by design; macOS development is supported through the Linux development container, while native macOS and Windows validation depend on suitable standard-reflection toolchains.
 
+### Included capabilities
+
+- Records based on public fields or explicitly marked simple getter/setter properties, including direction-specific properties.
+- Essential mapping overrides for names, keys, generated values, exclusions, and custom value conversions.
+- JSON interchange for Records, nested reflected values, optional values, and common sequences.
+- Synchronous PostgreSQL access for existing schemas.
+- Typed, parameterized raw SQL and explicit transactions.
+- Individual and batch typed CRUD with returned database-generated values.
+- Single-table typed filtering, sorting, limit/offset pagination, projections, count, and exists.
+- Practical scalar, string, byte, enum, optional/null, and date/time value mappings. PostgreSQL UUID values use `std::string`.
+- An installable and consumable CMake package.
+
+### Explicit exclusions
+
+- Relationships and joins.
+- Schema creation and migrations.
+- Async execution.
+- Database backends other than PostgreSQL.
+- External mapping of complete, unmodifiable third-party Record types.
+- First-class persistence for PostgreSQL JSON and JSONB columns.
+- Native-platform guarantees beyond the validated Linux toolchain.
+- Publication to C++ package registries.
 
 ### Milestones
 
-- [x] [Set up the original Clang reflection compiler (historical)](./milestones/000_clang_with_reflection_setup.md)
-- [ ] [Model to handle JSON](./milestones/001_the_first_steps.md)
+Every milestone is subject to the [project quality objectives](./goal.md#quality-objectives).
 
+- [ ] [000: Project revival](./milestones/000_project_revival.md)
+- [ ] [001: Record foundation](./milestones/001_record_foundation.md)
+- [ ] [002: JSON interchange](./milestones/002_json_interchange.md)
+- [ ] [003: PostgreSQL execution](./milestones/003_postgresql_execution.md)
+- [ ] [004: Typed ORM](./milestones/004_typed_orm.md)
+- [ ] [005: Release 0.1.0](./milestones/005_release_0_1_0.md)
 
----
+## Future ideas
 
-## 2025-Q3-Q4: Basic ORM
+- Full-lifecycle relationships and joins.
+- External mapping bridges for complete, unmodifiable third-party Record types.
+- Schema creation and migrations.
+- Additional database backends.
+- Async APIs.
+- Broader native-platform and compiler validation.
+- Publication to C++ package registries.
+- Additional PostgreSQL-specific value types.
 
-**Timeline**: Aug-Dec 2025
-
-### Goals
-- Implement basic ORM capabilities
-  - Basic and simple CRUD operations
-  - *Relationships* are planned for future releases
-
-### Milestones
-- [ ] [Simple ORM](./milestones/002_simple_orm.md)
-
----
-
-## Ideas for future releases
-- Relationships support
-- Migrations
+Future ideas do not have release numbers, priority, or internal milestones until work on them becomes current.
