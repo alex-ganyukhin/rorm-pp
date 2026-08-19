@@ -1,4 +1,4 @@
-#rorm - pp
+# rorm-pp
 C++26 **R**eflection based **O**bject **R**elational **M**apping for C++
 
 ## About
@@ -13,7 +13,8 @@ The project is a C++26 ORM prototype built around standard reflection.
 ## Documentation
 ### Management
 All the management documentation is placed in [doc/management](./doc/management).
-- The full roadmap: [roadmap.md](./doc/management/roadmap.md).
+- The release scope: [release.md](./doc/management/release-0.1.0/release.md).
+- The release roadmap and milestones: [roadmap.md](./doc/management/release-0.1.0/roadmap.md).
 
 ### Development
 All the development documentation is placed in [doc/development](./doc/development).
