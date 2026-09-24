@@ -40,3 +40,4 @@ CMake fetches GoogleTest during configuration. Do not edit or commit generated b
 - [ ] All public APIs are documented with Doxygen, except obvious things like plain getters and setters
 - [ ] No failed tests
 - [ ] No build warnings or errors
+- [ ] `doc/quickstart/*` are up to date with API changes
