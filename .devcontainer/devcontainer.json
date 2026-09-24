@@ -6,6 +6,9 @@
     "remoteUser": "developer",
     "updateRemoteUserUID": true,
     "postCreateCommand": "bash .devcontainer/post-create.sh",
+    "mounts": [
+        "source=${localEnv:HOME}/.ssh,target=/home/developer/.ssh,type=bind,readonly"
+    ],
     "customizations": {
         "vscode": {
             "extensions": [

@@ -1,47 +1,41 @@
-# Copyright 2025 Aleksandr Ganiukhin
+#Copyright 2025 Aleksandr Ganiukhin
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+#Licensed under the Apache                               License, Version 2.0( the "License" );
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the                            License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#http: // www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed      on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
 
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required( VERSION 3.25 )
 
-project(rorm LANGUAGES CXX)
+        project( rorm LANGUAGES CXX )
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+                option( RORM_BUILD_BENCHMARKS "Build rorm benchmarks" OFF )
 
-include(compiler)
+                        list( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
+
+                                include( compiler )
 
 # 3rd Party
-include(3rd_party/google_test/install_google_test.cmake)
+                                        include( 3rd_party / google_test / install_google_test.cmake )
+
+                                                if ( RORM_BUILD_BENCHMARKS ) include(
+                                                        3rd_party / google_benchmark / install_google_benchmark.cmake ) endif()
 
 
-add_library(
-    ${PROJECT_NAME}
-    INTERFACE
-)
-target_include_directories(
-    ${PROJECT_NAME}
-    INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/rorm/include
-)
-target_link_libraries(
-    ${PROJECT_NAME}
-    INTERFACE
-    rorm_compiler_options
-)
+                                                        add_library( $ { PROJECT_NAME } INTERFACE ) target_include_directories(
+                                                                $ { PROJECT_NAME } INTERFACE $ { CMAKE_CURRENT_SOURCE_DIR } / rorm / include )
+                                                                target_link_libraries( $ { PROJECT_NAME } INTERFACE rorm_compiler_options )
 
 
-###########################
-# Testing
-###########################
-enable_testing()
-add_subdirectory(tests)
+                                                                        ########################## #
+#Testing
+        ########################## #enable_testing() add_subdirectory( tests )
+
+                if ( RORM_BUILD_BENCHMARKS ) add_subdirectory( benchmarks ) endif()

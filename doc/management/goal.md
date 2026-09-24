@@ -17,17 +17,6 @@ rorm-pp aims to be an adoptable C++26 ORM that uses standard reflection to map o
 
 ## Quality objectives
 
-Each contribution to the project must meet the following quality objectives:
-
-- at least 95% Doxygen coverage of its public APIs;
-- at least 95% line coverage and 95% branch coverage;
-- unit and subsystem tests for its successful behavior and relevant failures; and
-- clean `-Wall -Wextra -Werror` builds under GCC 16.1 or newer.
-
-Tests and Doxygen comments are the primary product documentation. Add focused guides only where they provide a learning path that API comments and tests cannot.
-
-
-## Performance objectives
-
-- Maintain repeatable benchmarks from release `0.1.0` onward, but make no competitive performance claim until a specific target is adopted.
-- In the initial releases, the performance objective is not so critical. Execution paths may be suboptimal, but they must be correct and safe. The performance objective will become more important as the product matures.
+The [project constitution](../../.specify/memory/constitution.md) is authoritative for
+quality gates, tests, API documentation, and performance policy. Add focused guides only
+where API comments and tests do not provide an adequate learning path.

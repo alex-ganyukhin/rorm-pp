@@ -1,9 +1,11 @@
-# rorm-pp
+#rorm - pp
 
-rorm-pp provides reflection-based mapping between C++ data and relational database rows.
+rorm - pp provides            reflection -
+        based mapping between C++ data and relational database rows.
 
-## Language
+        ##Language
 
-**Record**:
-A user-defined C++ type mapped to a database table; each instance represents one stored row.
-_Avoid_: Model, Entity
+                ** Record** : A user -
+        defined C++ type mapped to a database table;
+each instance represents one stored           row._Avoid_ : Model
+    , Entity
