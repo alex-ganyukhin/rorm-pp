@@ -32,6 +32,8 @@ CMake fetches GoogleTest during configuration. Do not edit or commit generated b
 - Keep `-Wall -Wextra -Werror` clean. Fix diagnostics rather than weakening the warning policy.
 - Add the repository's Apache-2.0 copyright header to new source, CMake, and script files; see `doc/development/coding_style.md`.
 - Keep changes focused and avoid unrelated edits, especially in generated `build*` directories.
+- When planning changes, consult with ADRs of the project. Follow the decisions and guidelines documented therein, warn user if a proposed change conflicts with existing ADRs.
+
 
 ## Healthy project checklist
 

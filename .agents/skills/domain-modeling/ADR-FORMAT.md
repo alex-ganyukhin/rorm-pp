@@ -7,6 +7,10 @@ Create the `doc/adr/` directory lazily — only when the first ADR is needed.
 ## Template
 
 ```md
+---
+Status: Proposed|Active|Deprecated|Superseded by ADR-NNNN
+Date: 2026-06-12
+---
 # {Short title of the decision}
 
 {1-3 sentences: what's the context, what did we decide, and why.}
