@@ -53,7 +53,7 @@ BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 BreakInheritanceList: BeforeComma
-ColumnLimit: 140
+ColumnLimit: 120
 CompactNamespaces: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ContinuationIndentWidth: 8
@@ -73,7 +73,7 @@ PenaltyBreakOpenParenthesis: 10
 PenaltyExcessCharacter: 10
 PenaltyReturnTypeOnItsOwnLine: 10
 PointerAlignment: Left
-ReflowComments: true
+ReflowComments: false
 RequiresExpressionIndentation: OuterScope
 SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false

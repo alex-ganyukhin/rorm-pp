@@ -26,6 +26,8 @@ CMake fetches GoogleTest during configuration. Do not edit or commit generated b
 
 ## Change guidelines
 
+- When writing or changing documentation, follow [ADR 0002](doc/adr/0002-documentation-policy.md) and the [documentation writing guide](doc/development/documentation.md).
+
 - Keep public APIs in the `rorm` namespace and preserve the interface-library design unless the change explicitly requires compiled sources.
 - Add or update GoogleTest coverage for behavior changes. Register new test source files in `tests/CMakeLists.txt`.
 - Follow `.clang-format`; format changed C++ files with the standalone `clang-format` installed in the dev container.
@@ -39,7 +41,7 @@ CMake fetches GoogleTest during configuration. Do not edit or commit generated b
 
 - [ ] Changed files are formatted via `clang-format`
 - [ ] Code coverage is above 95% for lines and branches
-- [ ] All public APIs are documented with Doxygen, except obvious things like plain getters and setters
+- [ ] New or changed public APIs have Doxygen contracts and usage examples according to the documentation writing guide
 - [ ] No failed tests
 - [ ] No build warnings or errors
 - [ ] `doc/quickstart/*` are up to date with API changes
