@@ -25,9 +25,19 @@ if(RORM_BUILD_BENCHMARKS)
     include(3rd_party/google_benchmark/install_google_benchmark.cmake)
 endif()
 
+# Initial JSON backend; shared mapping remains backend-independent.
+include(FetchContent)
+FetchContent_Declare(
+    nlohmann_json
+    SYSTEM
+    URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
+
 add_library(rorm INTERFACE)
 target_include_directories(rorm INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/rorm/include)
-target_link_libraries(rorm INTERFACE rorm_compiler_options)
+target_link_libraries(rorm INTERFACE rorm_compiler_options nlohmann_json::nlohmann_json)
 
 enable_testing()
 add_subdirectory(tests)

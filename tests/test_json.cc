@@ -35,7 +35,7 @@
 #include <vector>
 
 namespace rorm_test {
-using rorm::unknown_members;
+
 using Json = nlohmann::json;
 
 class JsonTest : public testing::Test
@@ -64,7 +64,7 @@ TEST_F( JsonTest, GIVEN_public_fields_WHEN_serialized_THEN_all_fields_are_presen
 
 TEST_F( JsonTest, GIVEN_reordered_members_WHEN_deserialized_THEN_fields_match )
 {
-    auto value = rorm::from_json<Profile>( R"({"visits":7,"nickname":"Countess","name":"Ada"})", unknown_members::reject );
+    auto value = rorm::from_json<Profile>( R"({"visits":7,"nickname":"Countess","name":"Ada"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value, ExpectedValue( testing::Eq( Profile { "Ada", "Countess", 7 } ) ) );
 }
@@ -74,7 +74,7 @@ TEST_F( JsonTest, WHEN_record_round_trips_THEN_all_fields_are_preserved )
     const Profile original { "Ada", "Countess", 7 };
     auto          encoded = rorm::to_json( original );
     ASSERT_THAT( encoded, ExpectedValue( testing::_ ) );
-    auto decoded = rorm::from_json<Profile>( *encoded, unknown_members::reject );
+    auto decoded = rorm::from_json<Profile>( *encoded, {} );
     ASSERT_THAT( decoded, ExpectedValue( testing::_ ) );
     EXPECT_THAT( decoded, ExpectedValue( testing::Eq( original ) ) );
 }
@@ -84,7 +84,7 @@ TEST_F( JsonTest, GIVEN_missing_or_null_optional_WHEN_deserialized_THEN_optional
     for ( auto input : { R"({"name":"Ada","visits":1})", R"({"name":"Ada","nickname":null,"visits":1})" } )
     {
         SCOPED_TRACE( testing::PrintToString( input ) );
-        auto value = rorm::from_json<Profile>( input, unknown_members::reject );
+        auto value = rorm::from_json<Profile>( input, {} );
         ASSERT_THAT( value, ExpectedValue( testing::_ ) );
         EXPECT_EQ( value->name, "Ada" );
         EXPECT_FALSE( value->nickname );
@@ -95,7 +95,8 @@ TEST_F( JsonTest, GIVEN_missing_or_null_optional_WHEN_deserialized_THEN_optional
 
 TEST_F( JsonTest, GIVEN_ignore_policy_WHEN_unknown_member_is_read_THEN_known_fields_match )
 {
-    auto value = rorm::from_json<Profile>( R"({"name":"Ada","visits":1,"extra":{"x":[1,2]}})", unknown_members::ignore );
+    auto value = rorm::from_json<Profile>( R"({"name":"Ada","visits":1,"extra":{"x":[1,2]}})",
+                                           { .ignore_unknown_members = true } );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value, ExpectedValue( testing::Eq( Profile { "Ada", std::nullopt, 1 } ) ) );
 }
@@ -112,7 +113,7 @@ class JsonErrors : public testing::TestWithParam<ErrorCase>
 TEST_P( JsonErrors, WHEN_invalid_input_is_read_THEN_expected_error_is_returned )
 {
     const auto& test   = GetParam();
-    const auto  result = rorm::from_json<Profile>( test.input, unknown_members::reject );
+    const auto  result = rorm::from_json<Profile>( test.input, {} );
     EXPECT_THAT( result, ExpectedError( testing::Eq( rorm::make_error_code( test.code ) ) ) );
 }
 
@@ -150,7 +151,7 @@ TEST_F( JsonTest, WHEN_malformed_json_is_read_THEN_malformed_input_is_returned )
           { "", "{", R"({"name":"Ada",})", R"({"name":"Ada","visits":1} trailing)", R"({"name":"\uD800","visits":1})" } )
     {
         SCOPED_TRACE( testing::PrintToString( input ) );
-        const auto result = rorm::from_json<Profile>( input, unknown_members::reject );
+        const auto result = rorm::from_json<Profile>( input, {} );
         EXPECT_THAT( result,
                      ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::malformed_input ) ) ) );
     }
@@ -158,7 +159,8 @@ TEST_F( JsonTest, WHEN_malformed_json_is_read_THEN_malformed_input_is_returned )
 
 TEST_F( JsonTest, GIVEN_ignore_policy_WHEN_duplicate_member_is_read_THEN_duplicate_member_is_returned )
 {
-    auto result = rorm::from_json<Profile>( R"({"name":"Ada","visits":1,"extra":1,"extra":2})", unknown_members::ignore );
+    auto result = rorm::from_json<Profile>( R"({"name":"Ada","visits":1,"extra":1,"extra":2})",
+                                            { .ignore_unknown_members = true } );
     EXPECT_THAT( result,
                  ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::duplicate_member ) ) ) );
 }
@@ -181,7 +183,7 @@ TEST_F( JsonTest, GIVEN_Renamed_WHEN_serialized_THEN_json_matches )
 
 TEST_F( JsonTest, GIVEN_mapping_annotations_WHEN_deserialized_THEN_renames_and_exclusions_apply )
 {
-    auto value = rorm::from_json<Renamed>( R"({"display_name":"Ada"})", unknown_members::reject );
+    auto value = rorm::from_json<Renamed>( R"({"display_name":"Ada"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value, ExpectedValue( testing::Eq( Renamed { "Ada", 42 } ) ) );
 }
@@ -191,7 +193,7 @@ TEST_F( JsonTest, WHEN_unmapped_cpp_names_are_read_THEN_unknown_member_is_return
     for ( auto input : { R"({"display_name":"Ada","name":"Grace"})", R"({"display_name":"Ada","secret":99})" } )
     {
         SCOPED_TRACE( testing::PrintToString( input ) );
-        auto value = rorm::from_json<Renamed>( input, unknown_members::reject );
+        auto value = rorm::from_json<Renamed>( input, {} );
         EXPECT_THAT( value,
                      ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::unknown_member ) ) ) );
     }
@@ -232,8 +234,7 @@ TEST_F( JsonTest, WHEN_accessors_are_serialized_THEN_only_readable_properties_ar
 
 TEST_F( JsonTest, WHEN_accessors_are_deserialized_THEN_writable_state_matches )
 {
-    auto value = rorm::from_json<Accessors>( R"({"email":"ada@example.com","token":"secret","label":"ignored"})",
-                                             unknown_members::reject );
+    auto value = rorm::from_json<Accessors>( R"({"email":"ada@example.com","token":"secret","label":"ignored"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     Accessors expected;
     expected.email( "ada@example.com" );
@@ -260,14 +261,14 @@ TEST_F( JsonTest, GIVEN_Nested_WHEN_serialized_THEN_json_matches )
 
 TEST_F( JsonTest, WHEN_nested_records_are_deserialized_THEN_sequence_matches )
 {
-    auto value = rorm::from_json<Nested>( R"({"people":[{"name":"Ada","visits":2}]})", unknown_members::reject );
+    auto value = rorm::from_json<Nested>( R"({"people":[{"name":"Ada","visits":2}]})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value, ExpectedValue( testing::Eq( Nested { { { "Ada", std::nullopt, 2 } } } ) ) );
 }
 
 TEST_F( JsonTest, WHEN_nested_required_field_is_missing_THEN_missing_property_is_returned )
 {
-    auto value = rorm::from_json<Nested>( R"({"people":[{"name":"Ada"}]})", unknown_members::reject );
+    auto value = rorm::from_json<Nested>( R"({"people":[{"name":"Ada"}]})", {} );
     EXPECT_THAT( value, ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::missing_property ) ) ) );
 }
 
@@ -283,7 +284,7 @@ inline constexpr bool printable_record<EscapedName> = true;
 
 TEST_F( JsonTest, WHEN_renamed_property_has_wrong_type_THEN_input_is_rejected )
 {
-    auto value = rorm::from_json<EscapedName>( R"({"a~/b":"wrong"})", unknown_members::reject );
+    auto value = rorm::from_json<EscapedName>( R"({"a~/b":"wrong"})", {} );
     ASSERT_FALSE( value );
 }
 
@@ -305,7 +306,7 @@ TEST_F( JsonTest, GIVEN_Text_WHEN_serialized_THEN_json_matches )
 
 TEST_F( JsonTest, WHEN_escaped_text_is_deserialized_THEN_unicode_and_controls_are_preserved )
 {
-    auto value = rorm::from_json<Text>( R"({"text":"Ada\n\t\"\\\u0001 \u0416"})", unknown_members::reject );
+    auto value = rorm::from_json<Text>( R"({"text":"Ada\n\t\"\\\u0001 \u0416"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_EQ( value->text, "Ada\n\t\"\\\x01 Ж" );
 }
@@ -331,8 +332,7 @@ TEST_F( JsonTest, GIVEN_Numbers_WHEN_serialized_THEN_json_matches )
 
 TEST_F( JsonTest, WHEN_numeric_boundaries_are_deserialized_THEN_values_match )
 {
-    auto value = rorm::from_json<Numbers>( R"({"flag":true,"small":-128,"large":18446744073709551615,"real":1.25})",
-                                           unknown_members::reject );
+    auto value = rorm::from_json<Numbers>( R"({"flag":true,"small":-128,"large":18446744073709551615,"real":1.25})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value, ExpectedValue( testing::Eq( Numbers { true, -128, UINT64_MAX, 1.25 } ) ) );
 }
@@ -367,7 +367,7 @@ TYPED_TEST( JsonNumericTypes, WHEN_numeric_limits_round_trip_THEN_values_are_pre
                  expected }
         }.dump();
         EXPECT_THAT( rorm::to_json( NumericValue<TypeParam> { expected } ), ExpectedValue( JsonEq( input ) ) );
-        auto value = rorm::from_json<NumericValue<TypeParam>>( input, unknown_members::reject );
+        auto value = rorm::from_json<NumericValue<TypeParam>>( input, {} );
         ASSERT_THAT( value, ExpectedValue( testing::_ ) );
         EXPECT_THAT( value, ExpectedValue( testing::Eq( NumericValue<TypeParam> { expected } ) ) );
     }
@@ -379,7 +379,7 @@ TEST_F( JsonTest, WHEN_integer_is_out_of_range_THEN_out_of_range_is_returned )
           { R"({"flag":true,"small":128,"large":1,"real":1})", R"({"flag":true,"small":0,"large":-1,"real":1})" } )
     {
         SCOPED_TRACE( testing::PrintToString( input ) );
-        auto value = rorm::from_json<Numbers>( input, unknown_members::reject );
+        auto value = rorm::from_json<Numbers>( input, {} );
         EXPECT_THAT( value, ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::out_of_range ) ) ) );
     }
 }
@@ -418,14 +418,14 @@ TEST_F( JsonTest, GIVEN_EnumRecord_WHEN_serialized_THEN_json_matches )
 
 TEST_F( JsonTest, WHEN_enum_name_is_read_THEN_enumerator_matches )
 {
-    auto value = rorm::from_json<EnumRecord>( R"({"status":"active"})", unknown_members::reject );
+    auto value = rorm::from_json<EnumRecord>( R"({"status":"active"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_EQ( value->status, Status::active );
 }
 
 TEST_F( JsonTest, WHEN_unknown_enum_name_is_read_THEN_incompatible_value_is_returned )
 {
-    auto value = rorm::from_json<EnumRecord>( R"({"status":"missing"})", unknown_members::reject );
+    auto value = rorm::from_json<EnumRecord>( R"({"status":"missing"})", {} );
     EXPECT_THAT( value,
                  ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::incompatible_value ) ) ) );
 }
@@ -454,7 +454,7 @@ TEST_F( JsonTest, GIVEN_Bytes_WHEN_serialized_THEN_json_matches )
 
 TEST_F( JsonTest, WHEN_byte_sequences_are_deserialized_THEN_values_match )
 {
-    auto value = rorm::from_json<Bytes>( R"({"raw":[0,255],"encoded":"AQID","pair":[4,5]})", unknown_members::reject );
+    auto value = rorm::from_json<Bytes>( R"({"raw":[0,255],"encoded":"AQID","pair":[4,5]})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value,
                  ExpectedValue( testing::Eq( Bytes {
@@ -466,14 +466,14 @@ TEST_F( JsonTest, WHEN_byte_sequences_are_deserialized_THEN_values_match )
 
 TEST_F( JsonTest, WHEN_invalid_base64_is_read_THEN_incompatible_value_is_returned )
 {
-    auto value = rorm::from_json<Bytes>( R"({"raw":[],"encoded":"???","pair":[1,2]})", unknown_members::reject );
+    auto value = rorm::from_json<Bytes>( R"({"raw":[],"encoded":"???","pair":[1,2]})", {} );
     EXPECT_THAT( value,
                  ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::incompatible_value ) ) ) );
 }
 
 TEST_F( JsonTest, WHEN_array_length_is_wrong_THEN_incompatible_value_is_returned )
 {
-    auto value = rorm::from_json<Bytes>( R"({"raw":[],"encoded":"","pair":[1]})", unknown_members::reject );
+    auto value = rorm::from_json<Bytes>( R"({"raw":[],"encoded":"","pair":[1]})", {} );
     EXPECT_THAT( value,
                  ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::incompatible_value ) ) ) );
 }
@@ -501,16 +501,14 @@ TEST_F( JsonTest, WHEN_timestamp_has_offset_THEN_deserialization_normalizes_to_u
 {
     using namespace std::chrono;
     const auto instant = sys_days { 2026y / September / 20 } + 10h + 30min + 15s + 125ms;
-    auto value = rorm::from_json<Dates>( R"({"birthday":"1990-12-10","created_at":"2026-09-20T12:30:15.125+02:00"})",
-                                         unknown_members::reject );
+    auto value = rorm::from_json<Dates>( R"({"birthday":"1990-12-10","created_at":"2026-09-20T12:30:15.125+02:00"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value, ExpectedValue( testing::Eq( Dates { 1990y / December / 10, instant } ) ) );
 }
 
 TEST_F( JsonTest, WHEN_invalid_date_is_read_THEN_incompatible_value_is_returned )
 {
-    auto value = rorm::from_json<Dates>( R"({"birthday":"2026-02-30","created_at":"2026-09-20T10:30:15.125Z"})",
-                                         unknown_members::reject );
+    auto value = rorm::from_json<Dates>( R"({"birthday":"2026-02-30","created_at":"2026-09-20T10:30:15.125Z"})", {} );
     EXPECT_THAT( value,
                  ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::incompatible_value ) ) ) );
 }
@@ -554,14 +552,14 @@ TEST_F( JsonTest, GIVEN_Converted_WHEN_serialized_THEN_json_matches )
 
 TEST_F( JsonTest, WHEN_converted_id_is_read_THEN_custom_conversion_applies )
 {
-    auto value = rorm::from_json<Converted>( R"({"id":"42"})", unknown_members::reject );
+    auto value = rorm::from_json<Converted>( R"({"id":"42"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value, ExpectedValue( testing::Eq( Converted { UserId { 42 } } ) ) );
 }
 
 TEST_F( JsonTest, WHEN_decode_conversion_fails_THEN_original_error_is_returned )
 {
-    auto value = rorm::from_json<Converted>( R"({"id":"bad"})", unknown_members::reject );
+    auto value = rorm::from_json<Converted>( R"({"id":"bad"})", {} );
     EXPECT_THAT( value, ExpectedError( testing::Eq( std::make_error_code( std::errc::invalid_argument ) ) ) );
 }
 
@@ -587,7 +585,7 @@ TEST_F( JsonTest, WHEN_converted_accessors_round_trip_THEN_id_is_preserved )
     ConvertedAccessors original;
     original.id( UserId { 42 } );
     EXPECT_THAT( rorm::to_json( original ), ExpectedValue( JsonEq( R"({"id":"42"})" ) ) );
-    auto value = rorm::from_json<ConvertedAccessors>( R"({"id":"42"})", unknown_members::reject );
+    auto value = rorm::from_json<ConvertedAccessors>( R"({"id":"42"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_THAT( value, ExpectedValue( testing::Eq( original ) ) );
 }
@@ -631,7 +629,7 @@ TEST_F( JsonTest, GIVEN_combined_mapping_WHEN_round_tripped_THEN_state_is_preser
     EXPECT_THAT( rorm::to_json( original ), ExpectedValue( JsonEq( expected ) ) );
     auto encoded = rorm::to_json( original );
     ASSERT_THAT( encoded, ExpectedValue( testing::_ ) );
-    auto decoded = rorm::from_json<FullRecord>( *encoded, unknown_members::reject );
+    auto decoded = rorm::from_json<FullRecord>( *encoded, {} );
     ASSERT_THAT( decoded, ExpectedValue( testing::_ ) );
     EXPECT_THAT( decoded, ExpectedValue( testing::Eq( original ) ) );
     EXPECT_THAT( rorm::to_json( *decoded ), ExpectedValue( JsonEq( expected ) ) );
@@ -639,24 +637,24 @@ TEST_F( JsonTest, GIVEN_combined_mapping_WHEN_round_tripped_THEN_state_is_preser
 
 TEST_F( JsonTest, WHEN_readonly_property_is_absent_THEN_deserialization_succeeds )
 {
-    auto value = rorm::from_json<Accessors>( R"({"email":"ada@example.com","token":"secret"})", unknown_members::reject );
+    auto value = rorm::from_json<Accessors>( R"({"email":"ada@example.com","token":"secret"})", {} );
     ASSERT_THAT( value, ExpectedValue( testing::_ ) );
     EXPECT_EQ( value->label(), "<ada@example.com>" );
 }
 
 TEST_F( JsonTest, WHEN_setteronly_property_is_absent_THEN_missing_property_is_returned )
 {
-    auto value = rorm::from_json<Accessors>( R"({"email":"ada@example.com"})", unknown_members::reject );
+    auto value = rorm::from_json<Accessors>( R"({"email":"ada@example.com"})", {} );
     EXPECT_THAT( value, ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::missing_property ) ) ) );
 }
 
 TEST_F( JsonTest, WHEN_nested_unknown_member_is_read_THEN_selected_policy_applies )
 {
     const auto input    = R"({"people":[{"name":"Ada","visits":2,"extra":1}]})";
-    auto       rejected = rorm::from_json<Nested>( input, unknown_members::reject );
+    auto       rejected = rorm::from_json<Nested>( input, {} );
     EXPECT_THAT( rejected,
                  ExpectedError( testing::Eq( rorm::make_error_code( rorm::json_error_code::unknown_member ) ) ) );
-    auto accepted = rorm::from_json<Nested>( input, unknown_members::ignore );
+    auto accepted = rorm::from_json<Nested>( input, { .ignore_unknown_members = true } );
     ASSERT_THAT( accepted, ExpectedValue( testing::_ ) );
     ASSERT_EQ( accepted->people.size(), 1U );
     EXPECT_EQ( accepted->people.front().name, "Ada" );
@@ -687,8 +685,7 @@ template<typename Record>
 concept accepts_implicit_unknown_policy = requires( std::string_view input ) { rorm::from_json<Record>( input ); };
 static_assert( !accepts_implicit_unknown_policy<Profile> );
 static_assert( std::is_same_v<decltype( rorm::to_json( Profile {} ) ), std::expected<std::string, std::error_code>> );
-static_assert( std::is_same_v<decltype( rorm::from_json<Profile>( "", unknown_members::reject ) ),
-                              std::expected<Profile, std::error_code>> );
+static_assert( std::is_same_v<decltype( rorm::from_json<Profile>( "", {} ) ), std::expected<Profile, std::error_code>> );
 
 TEST_F( JsonErrorsSupportTest, WHEN_error_codes_are_constructed_THEN_category_and_messages_are_stable )
 {

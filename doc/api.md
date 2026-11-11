@@ -116,7 +116,7 @@ template<typename Record>
 std::expected<std::string, std::error_code> to_json( const Record& record );
 
 template<typename Record>
-std::expected<Record, std::error_code> from_json( std::string_view input, unknown_members policy );
+std::expected<Record, std::error_code> from_json( std::string_view input, deserialization_policy policy );
 }
 ```
 
@@ -378,7 +378,7 @@ int main()
                 "email": "ada@example.com",
                 "display_label": "ignored"
             })json",
-            rorm::unknown_members::reject );
+            {} );
 
     if ( !decoded )
         return 1;

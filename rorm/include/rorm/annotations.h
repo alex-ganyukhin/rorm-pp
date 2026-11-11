@@ -21,6 +21,7 @@
 #ifndef RORM_PP__RORM_ANNOTATIONS_H
 #define RORM_PP__RORM_ANNOTATIONS_H
 
+#include <meta>
 #include <string_view>
 
 namespace rorm {
@@ -29,29 +30,52 @@ namespace rorm {
  * @see    rorm::name
  */
 struct name_annotation
-{};
+{
+    const char* data;
+    std::size_t size;
+};
 
 /**
  * @brief  Annotation type returned by rorm::getter. Use the factory to create values.
  * @see    rorm::getter
  */
 struct getter_annotation
-{};
+{
+    const char* data;
+    std::size_t size;
+};
 
 /**
  * @brief  Annotation type returned by rorm::setter. Use the factory to create values.
  * @see    rorm::setter
  */
 struct setter_annotation
-{};
+{
+    const char* data;
+    std::size_t size;
+};
 
 /**
  * @brief  Annotation type returned by rorm::as. Use the factory to create values.
  * @see    rorm::as
  */
 template<typename Shared, typename... Converters>
-struct conversion_annotation
-{};
+struct conversion_annotation;
+
+template<typename Shared, typename Converter>
+struct conversion_annotation<Shared, Converter>
+{
+    using logical_type = Shared;
+    Converter first;
+};
+
+template<typename Shared, typename To, typename From>
+struct conversion_annotation<Shared, To, From>
+{
+    using logical_type = Shared;
+    To   first;
+    From second;
+};
 
 /**
  * @brief  Declare a logical name shared by all mapping consumers (planned).
@@ -65,9 +89,9 @@ struct conversion_annotation
  *     };
  * @endcode
  */
-consteval name_annotation name( std::string_view )
+consteval name_annotation name( std::string_view value )
 {
-    return name_annotation {};
+    return name_annotation { std::define_static_string( value ), value.size() };
 }
 
 /**
@@ -102,9 +126,9 @@ inline constexpr ignore_annotation ignore {};
  *     };
  * @endcode
  */
-consteval getter_annotation getter( std::string_view )
+consteval getter_annotation getter( std::string_view value )
 {
-    return getter_annotation {};
+    return getter_annotation { std::define_static_string( value ), value.size() };
 }
 
 /**
@@ -120,9 +144,9 @@ consteval getter_annotation getter( std::string_view )
  *     };
  * @endcode
  */
-consteval setter_annotation setter( std::string_view )
+consteval setter_annotation setter( std::string_view value )
 {
-    return setter_annotation {};
+    return setter_annotation { std::define_static_string( value ), value.size() };
 }
 
 /**
@@ -146,9 +170,9 @@ consteval setter_annotation setter( std::string_view )
  * @tparam  Shared  Logical type used by mapping consumers.
  */
 template<typename Shared, typename ToShared, typename FromShared>
-consteval auto as( ToShared, FromShared )
+consteval auto as( ToShared to, FromShared from )
 {
-    return conversion_annotation<Shared, ToShared, FromShared> {};
+    return conversion_annotation<Shared, ToShared, FromShared> { to, from };
 }
 
 /**
@@ -173,9 +197,9 @@ consteval auto as( ToShared, FromShared )
  * @tparam  Shared  Logical type used by mapping consumers.
  */
 template<typename Shared, typename Converter>
-consteval auto as( Converter )
+consteval auto as( Converter converter )
 {
-    return conversion_annotation<Shared, Converter> {};
+    return conversion_annotation<Shared, Converter> { converter };
 }
 
 /**
@@ -225,7 +249,10 @@ inline constexpr generated_annotation generated {};
  * @see    rorm::table
  */
 struct table_annotation
-{};
+{
+    const char* data;
+    std::size_t size;
+};
 
 /**
  * @brief  Declare the table name for typed ORM operations (planned).
@@ -239,9 +266,9 @@ struct table_annotation
  *     };
  * @endcode
  */
-consteval table_annotation table( std::string_view )
+consteval table_annotation table( std::string_view value )
 {
-    return table_annotation {};
+    return table_annotation { std::define_static_string( value ), value.size() };
 }
 
 /**

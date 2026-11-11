@@ -30,6 +30,6 @@ struct Record
 int main()
 {
     auto encoded = rorm::to_json( Record {} );
-    auto decoded = rorm::from_json<Record>( "{}", rorm::unknown_members::reject );
+    auto decoded = rorm::from_json<Record>( "{}", {} );
     return encoded.has_value() && decoded.has_value() ? 0 : 1;
 }

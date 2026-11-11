@@ -6,3 +6,6 @@ build*/
 
 # settings for editors
 .vscode
+
+# Local implementation orchestration artifacts
+.superpowers/

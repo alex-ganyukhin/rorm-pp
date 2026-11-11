@@ -15,7 +15,7 @@
 execute_process(
     COMMAND "${CMAKE_COMMAND}" -E env LC_ALL=C "${COMPILER}"
         -std=c++26 -freflection -Wall -Wextra -Werror -fdiagnostics-plain-output
-        "-I${INCLUDE_DIR}" -fsyntax-only "${SOURCE}"
+        "-I${INCLUDE_DIR}" -isystem "${BACKEND_INCLUDE}" -fsyntax-only "${SOURCE}"
     RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE error
 )
 if(NOT result MATCHES "^[0-9]+$" OR result STREQUAL "0")

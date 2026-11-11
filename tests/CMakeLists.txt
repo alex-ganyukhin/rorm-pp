@@ -18,20 +18,15 @@ enable_testing()
 
 project(rorm_test)
 
-# Test-only JSON oracle; public rorm headers remain backend-independent.
-include(FetchContent)
-FetchContent_Declare(
-    nlohmann_json
-    SYSTEM
-    URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
-)
-FetchContent_MakeAvailable(nlohmann_json)
-
 add_executable(
     ${PROJECT_NAME}
     test_reflection.cc
     test_support.cc
     test_json.cc
+    test_json_mapping.cc
+    test_json_input.cc
+    test_json_values.cc
+    test_json_codecs.cc
 )
 
 target_link_libraries(
@@ -51,7 +46,7 @@ gtest_discover_tests(${PROJECT_NAME})
 find_program(RORM_FILECHECK NAMES FileCheck FileCheck-19 REQUIRED)
 add_test(NAME CompileCheck.Positive
     COMMAND "${CMAKE_CXX_COMPILER}" -std=c++26 -freflection -Wall -Wextra -Werror
-        "-I${CMAKE_SOURCE_DIR}/rorm/include" -fsyntax-only
+        "-I${CMAKE_SOURCE_DIR}/rorm/include" -isystem "$<TARGET_PROPERTY:nlohmann_json::nlohmann_json,INTERFACE_INCLUDE_DIRECTORIES>" -fsyntax-only
         "${CMAKE_CURRENT_SOURCE_DIR}/compile_positive.cc")
 file(GLOB compile_fail_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/compile_fail/*.cc")
 foreach(source IN LISTS compile_fail_sources)
@@ -60,6 +55,7 @@ foreach(source IN LISTS compile_fail_sources)
         COMMAND "${CMAKE_COMMAND}"
             "-DCOMPILER=${CMAKE_CXX_COMPILER}"
             "-DFILECHECK=${RORM_FILECHECK}"
+            "-DBACKEND_INCLUDE=$<TARGET_PROPERTY:nlohmann_json::nlohmann_json,INTERFACE_INCLUDE_DIRECTORIES>"
             "-DINCLUDE_DIR=${CMAKE_SOURCE_DIR}/rorm/include"
             "-DSOURCE=${source}"
             "-DDIAGNOSTICS=${CMAKE_CURRENT_BINARY_DIR}/${name}.diagnostics"

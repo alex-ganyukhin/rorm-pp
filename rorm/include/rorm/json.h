@@ -21,6 +21,7 @@
 #define RORM_PP__RORM_JSON_H
 
 #include <rorm/annotations.h>
+#include <rorm/detail/record_mapping.h>
 
 #include <cstddef>
 #include <expected>
@@ -30,23 +31,22 @@
 
 namespace rorm {
 /**
- * @brief  Choose how deserialization should handle members absent from a Record mapping (planned).
+ * @brief  Choose how deserialization handles members absent from a Record mapping.
  *
- * The policy is required on every from_json call and is intended to apply recursively to nested Records. The scaffold ignores it.
+ * The policy is required on every from_json call and applies recursively to nested Records. Duplicate members remain errors.
  *
  * @code{.cpp}
  *     struct Profile
  *     {
  *         std::string name;
  *     };
- *     auto strict   = rorm::from_json<Profile>( R"({"name":"Ada"})", rorm::unknown_members::reject );
- *     auto tolerant = rorm::from_json<Profile>( R"({"name":"Ada","extra":1})", rorm::unknown_members::ignore );
+ *     auto strict   = rorm::from_json<Profile>( R"({"name":"Ada"})", {} );
+ *     auto tolerant = rorm::from_json<Profile>( R"({"name":"Ada","extra":1})", { .ignore_unknown_members = true } );
  * @endcode
  */
-enum class unknown_members
+struct deserialization_policy
 {
-    reject, ///< Report an unknown_member error.
-    ignore  ///< Skip unknown members; duplicate members remain errors.
+    bool ignore_unknown_members = false; ///< Skip unknown names recursively; duplicates remain errors.
 };
 
 /**
@@ -115,6 +115,17 @@ inline std::error_code make_error_code( json_error_code code ) noexcept
     return { static_cast<int>( code ), category };
 }
 
+} // namespace rorm
+
+namespace std {
+template<>
+struct is_error_code_enum<rorm::json_error_code> : true_type
+{};
+} // namespace std
+
+#include <rorm/detail/json_impl.ipp>
+
+namespace rorm {
 /**
  * @brief   Serialize readable Record properties to an owning UTF-8 JSON string (planned).
  *
@@ -141,9 +152,20 @@ inline std::error_code make_error_code( json_error_code code ) noexcept
  *          converter errors; invalid mappings are intended to fail at compile time.
  */
 template<typename Record>
-std::expected<std::string, std::error_code> to_json( const Record& )
+std::expected<std::string, std::error_code> to_json( const Record& record )
 {
-    return std::string {};
+    static_assert( sizeof( detail::record_mapping<Record> ) > 0 );
+    auto value = detail::encode_record( record );
+    if ( !value )
+        return std::unexpected( value.error() );
+    try
+    {
+        return value->dump();
+    }
+    catch ( const detail::json_value::type_error& )
+    {
+        return std::unexpected( make_error_code( json_error_code::incompatible_value ) );
+    }
 }
 
 /**
@@ -160,7 +182,7 @@ std::expected<std::string, std::error_code> to_json( const Record& )
  *     {
  *         std::string name;
  *     };
- *     auto decoded = rorm::from_json<Profile>( R"({"name":"Ada"})", rorm::unknown_members::reject );
+ *     auto decoded = rorm::from_json<Profile>( R"({"name":"Ada"})", {} );
  *     if ( !decoded )
  *     {
  *         std::cerr << decoded.error().message() << '\n';
@@ -174,15 +196,13 @@ std::expected<std::string, std::error_code> to_json( const Record& )
  *          properties, incompatible or out-of-range values, and unchanged converter errors.
  */
 template<typename Record>
-std::expected<Record, std::error_code> from_json( std::string_view, unknown_members )
+std::expected<Record, std::error_code> from_json( std::string_view input, deserialization_policy policy )
 {
-    return Record {};
+    static_assert( sizeof( detail::record_mapping<Record> ) > 0 );
+    auto parsed = detail::parse_json( input );
+    if ( !parsed )
+        return std::unexpected( parsed.error() );
+    return detail::decode_record<Record>( *parsed, policy );
 }
 } // namespace rorm
-
-namespace std {
-template<>
-struct is_error_code_enum<rorm::json_error_code> : true_type
-{};
-} // namespace std
 #endif

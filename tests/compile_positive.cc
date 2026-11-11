@@ -54,3 +54,22 @@ int main()
     auto encoded = rorm::to_json( Positive {} );
     return encoded.has_value() ? 0 : 1;
 }
+
+static_assert( !rorm::deserialization_policy {}.ignore_unknown_members );
+static_assert( rorm::deserialization_policy { .ignore_unknown_members = true }.ignore_unknown_members );
+static_assert( std::string_view( rorm::name( "retained" ).data, rorm::name( "retained" ).size ) == "retained" );
+
+constexpr int plus_one( int value )
+{
+    return value + 1;
+}
+
+struct Stateful
+{
+    int increment;
+
+    constexpr int operator()( int value ) const { return value + increment; }
+};
+
+static_assert( rorm::as<int>( &plus_one ).first( 1 ) == 2 );
+static_assert( rorm::as<int>( Stateful { 3 } ).first( 1 ) == 4 );

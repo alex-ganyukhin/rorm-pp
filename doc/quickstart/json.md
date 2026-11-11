@@ -27,7 +27,7 @@ int main()
 {
     auto profile = rorm::from_json<Profile>(
             R"({"name":"Ada","nickname":null,"visits":1})",
-            rorm::unknown_members::reject );
+            {} );
     if ( !profile )
         return 1; // Inspect profile.error() for the error code and its category message.
 
