@@ -51,6 +51,10 @@ Returned errors and thrown exceptions are different contracts. Do not invent exc
 Simple APIs may need only a brief and example; parameter entries are not mandatory boilerplate. See the [Doxygen command
 reference](https://www.doxygen.nl/manual/commands.html).
 
+Supporting annotation types may use a concise description and a reference to their named constant or factory instead of repeating
+a contract or usage example. These types support reflection and type inspection; create annotation values through the documented constants
+and factories. Direct construction is not a supported API contract.
+
 ### Format comments for readability
 
 Use multiline `/** … */` blocks with vertically aligned leading `*` characters. Use spaces for alignment and one blank comment line between
@@ -83,7 +87,7 @@ This illustrates documentation for the intended annotation contract, without cla
  *     };
  * @endcode
  */
-consteval auto name( std::string_view value );
+consteval name_annotation name( std::string_view value );
 ```
 
 ### Expanded public comment

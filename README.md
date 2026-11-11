@@ -20,7 +20,9 @@ All the management documentation is placed in [doc/management](./doc/management)
 All the development documentation is placed in [doc/development](./doc/development).
 
 ### Usage documentation
-- TBD
+- [JSON quickstart](./doc/quickstart/json.md): intended workflow; the current API contains dummy scaffolds.
+- [ORM quickstart](./doc/quickstart/orm.md): provisional, unimplemented database API.
+- [Planned API](./doc/api.md): contracts retained until implementation; implemented contracts live in header Doxygen comments.
 
 ## Licensing
 The library is licensed under the Apache License, Version 2.0. Please see [LICENSE](./LICENSE) for more details.
@@ -31,7 +33,8 @@ created, its post-create step compiles a standalone C++26 reflection example to 
 
 ### Requirements
 - Docker Desktop
-- Visual Studio Code with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+- Visual Studio Code with the [Dev Containers
+  extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
 ### Getting started
 1. Start Docker Desktop.
@@ -84,3 +87,15 @@ Add benchmarks to `benchmarks/benchmark_dummy.cc`, or replace that dummy source 
 
 ## Footer
 **Founded** in Feb 2025.
+
+### Compilation diagnostic tests
+
+Place invalid-code snippets in `tests/compile_fail/*.cc` with FileCheck `CHECK:` comments matching GCC error messages.
+CMake automatically registers each file. With Ninja, additions and removals trigger CMake regeneration on the next build;
+CTest alone does not refresh discovery.
+
+The dev container provides FileCheck through `llvm-19-tools`. Configuration requires `FileCheck` or `FileCheck-19`;
+set `RORM_FILECHECK` to override its path. Tests require both GCC compilation failure and matching diagnostics.
+FileCheck does not automatically reject additional diagnostics. Run checks with
+`ctest --test-dir build-devcontainer -R 'JsonMapping|CompileCheck' --output-on-failure`.
+Mapping checks remain red until mapping validation is implemented.

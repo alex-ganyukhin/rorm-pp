@@ -1,4 +1,6 @@
 /**
+ * @file    test_reflection.cc
+ *
  * Copyright 2025 Aleksandr Ganiukhin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @file     test_reflection.cc
  * @date     2025-03-02
  *
  * @author   Alexander Ganyukhin (aganyukhin@outlook.com)
@@ -30,6 +31,7 @@
 #include <string>
 
 using namespace std::string_literals;
+
 struct As
 {
     char value[6];

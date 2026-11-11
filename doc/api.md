@@ -1,42 +1,55 @@
 # rorm 0.1.0 API
 
-> Record and JSON declarations are the 0.1.0 contract. PostgreSQL and typed ORM declarations remain provisional until their milestones.
+> Record mapping and JSON exchange below are the intended 0.1.0 contract, not implemented behavior. The headers contain API/red-test
+> scaffolds: annotations discard their arguments, `to_json` returns an empty string, and `from_json` returns `Record {}` without parsing.
+> PostgreSQL and typed ORM declarations remain provisional and are not present in the headers.
+
+Implemented contracts live beside their declarations in Doxygen. This specification retains unimplemented scope until behavior is delivered,
+following [ADR 0002](adr/0002-documentation-policy.md). See the [JSON quickstart](quickstart/json.md) for the intended workflow.
 
 ## Annotations
 
-| Annotation               | Applies to                             | Effect                                                            |
-| ------------------------ | -------------------------------------- | ----------------------------------------------------------------- |
-| `rorm::name("name")`     | Public field or enumerator             | Replaces the reflected name for every consumer.                   |
-| `rorm::ignore`           | Public field                           | Excludes the field from the logical property set.                 |
-| `rorm::getter("name")`   | Public const method with no parameters | Declares the readable side of a logical property.                 |
-| `rorm::setter("name")`   | Public method with one parameter       | Declares the writable side of a logical property.                 |
-| `rorm::as<T>(to, from)`  | Public field                           | Converts between the stored and logical types.                    |
-| `rorm::as<T>(converter)` | Getter or setter method                | Converts the accessor's available direction.                      |
-| `rorm::primary_key`      | Public field, getter, or setter        | Identifies the single primary key used by ORM operations.         |
-| `rorm::generated`        | Public field, getter, or setter        | Omits the property from writes and retrieves its generated value. |
-| `rorm::table("name")`    | Record type                            | Supplies the table name to typed ORM operations.                  |
-| `rorm::json::base64`     | Byte-like field, getter, or setter     | Uses a base64 JSON string instead of an integer array.            |
+All annotations are declared in [`<rorm/annotations.h>`](../rorm/include/rorm/annotations.h). The effects below are planned.
+
+| Annotation | Applies to | Intended effect |
+| --- | --- | --- |
+| `rorm::name("name")` | Public field or enumerator | Replaces the reflected name for every consumer. |
+| `rorm::ignore` | Public field | Excludes the field from the logical property set. |
+| `rorm::getter("name")` | Public const method with no parameters | Declares the readable side of a logical property. |
+| `rorm::setter("name")` | Public method with one parameter | Declares the writable side of a logical property. |
+| `rorm::as<T>(to, from)` | Public field | Converts between stored and logical types. |
+| `rorm::as<T>(converter)` | Getter or setter method | Converts the accessor's available direction. |
+| `rorm::primary_key` | Public field, getter, or setter | Identifies the single ORM primary key. |
+| `rorm::generated` | Public field, getter, or setter | Omits ORM writes; retrieves generated values. |
+| `rorm::table("name")` | Record type | Supplies the ORM table name. |
+| `rorm::base64` | Byte-like field, getter, or setter | Requests base64 representation of bytes. |
 
 ## Error handling
 
-- As much errors as possible are reported at a compile-time:
-  - Consistency of the definitions, including missing setters or getters for reading or writing operations
-  - Correct usage of annotations
-  - Correct usage of transactions, connections, and ORM operations
-  - ...
-- The records which cannot be detected at a compile-time will be reported at runtime via std::expected<X, std::error_code>.
-- The library aims at throwing exceptions only for unrecoverable errors and hard faults, which hopefully remain rare.
+- Invalid mappings and incompatible typed operations are intended to fail at compile time where the necessary information is available.
+- Runtime operation failures use `std::expected<T, std::error_code>`; this does not promise that allocation or user code cannot throw.
+- JSON reason codes and their implemented category/construction contract are documented in
+  [`<rorm/json.h>`](../rorm/include/rorm/json.h). Converter-returned errors are intended to pass through unchanged.
+
+## Planned Record mapping
+
+A Record exposes public fields and explicitly annotated accessors as logical properties. A getter and setter with the same logical name
+form one property and must agree on its logical type. Getter-only properties are readable; setter-only properties are writable. JSON reads
+only readable properties on output and assigns only writable properties on input. ORM key and generated-value annotations do not exclude
+properties from JSON.
+
+Mapping validation is intended to reject duplicate logical names, field/accessor collisions, invalid accessor signatures, incompatible
+getter/setter types, incompatible converters, base64 on non-byte values, and exclusion combined with other mapping annotations. No such
+validation exists in the scaffolds yet.
+
+Converters map stored values to a shared logical type and back, returning a destination value or
+`std::expected<destination, std::error_code>`. Fields supply both directions; an accessor supplies its available direction.
 
 ```cpp
 namespace rorm
 {
-class conversion_error
-{
-public:
-    std::string_view message() const noexcept;
-};
 
-consteval auto name( std::string_view value );
+consteval name_annotation name( std::string_view value );
 
 struct ignore_annotation
 {
@@ -44,8 +57,8 @@ struct ignore_annotation
 
 inline constexpr ignore_annotation ignore {};
 
-consteval auto getter( std::string_view property_name );
-consteval auto setter( std::string_view property_name );
+consteval getter_annotation getter( std::string_view property_name );
+consteval setter_annotation setter( std::string_view property_name );
 
 template<typename Shared, typename ToShared, typename FromShared>
 consteval auto as( ToShared to_shared, FromShared from_shared );
@@ -64,55 +77,46 @@ struct generated_annotation
 inline constexpr primary_key_annotation primary_key {};
 inline constexpr generated_annotation   generated {};
 
-consteval auto table( std::string_view table_name );
+consteval table_annotation table( std::string_view table_name );
 
-namespace json
-{
 struct base64_annotation
 {
 };
 
 inline constexpr base64_annotation base64 {};
 }
-}
 ```
 
 ## JSON
 
+The functions below are placeholders. Their Doxygen comments describe current returns and intended result handling; the following mapping
+rules remain unimplemented:
+
+- Booleans, fixed-width integers, floating-point values, and UTF-8 strings map to corresponding JSON scalar values. Reject incompatible
+  scalar types, numeric overflow/underflow, and non-finite floating-point output; do not silently narrow values.
+- Enums use reflected enumerator names, including `rorm::name` overrides; unknown names are incompatible values.
+- Optional values use JSON null when disengaged; missing or null optional input produces a disengaged value.
+- Nested Records and common sequences map recursively to objects and arrays. Fixed-size sequences require the matching input length.
+- Byte sequences use integer arrays by default, or base64 strings with `rorm::base64`; malformed base64 is an incompatible value.
+- `std::chrono::year_month_day` uses `YYYY-MM-DD`. Timestamps in `std::chrono::sys_time<std::chrono::milliseconds>` use ISO 8601 strings;
+  normalize input offsets to UTC and emit UTC with millisecond precision.
+- Deserialize a JSON object into a new Record. Require non-optional writable properties even when their C++ fields have initializers.
+  Read-only mapped members may be absent and are accepted without assignment when present. Return no partial Record on failure.
+- Require an explicit unknown-member policy, including for nested Records. Duplicate members fail even under `ignore`.
+- Reject malformed syntax/encoding, trailing input, incompatible values, and missing required properties. JSON object order and output
+  whitespace are unspecified. Return an owning string on output; do not retain the input view.
+
+The implemented error enums and `make_error_code` are documented in [`<rorm/json.h>`](../rorm/include/rorm/json.h), rather than duplicated
+here.
+
 ```cpp
 namespace rorm
 {
-enum class unknown_members
-{
-    reject,
-    ignore
-};
-
-enum class json_error_code
-{
-    malformed_input,
-    duplicate_member,
-    unknown_member,
-    missing_property,
-    incompatible_value,
-    out_of_range,
-    conversion_failed
-};
-
-class json_error
-{
-public:
-    json_error_code            code() const noexcept;
-    std::string_view           path() const noexcept;
-    std::optional<std::size_t> byte_offset() const noexcept;
-    std::string_view           message() const noexcept;
-};
+template<typename Record>
+std::expected<std::string, std::error_code> to_json( const Record& record );
 
 template<typename Record>
-std::expected<std::string, json_error> to_json( const Record& record );
-
-template<typename Record>
-std::expected<Record, json_error> from_json( std::string_view input, unknown_members policy );
+std::expected<Record, std::error_code> from_json( std::string_view input, unknown_members policy );
 }
 ```
 
@@ -134,12 +138,6 @@ enum class error_code
     operation_failed
 };
 
-class error
-{
-public:
-    error_code       code() const noexcept;
-    std::string_view message() const noexcept;
-};
 
 class transaction
 {
@@ -152,8 +150,8 @@ public:
 
     ~transaction();
 
-    std::expected<void, error> commit();
-    std::expected<void, error> rollback();
+    std::expected<void, std::error_code> commit();
+    std::expected<void, std::error_code> rollback();
 };
 
 class connection
@@ -167,17 +165,19 @@ public:
 
     ~connection();
 
-    std::expected<transaction, error> begin();
+    std::expected<transaction, std::error_code> begin();
 };
 
-std::expected<connection, error> connect( std::string_view connection_string );
+std::expected<connection, std::error_code> connect( std::string_view connection_string );
 
 template<typename Operation>
 auto atomically( connection& connection, Operation&& operation );
 }
 ```
 
-`atomically` begins a transaction and passes it to the callback. The callback returns `std::expected<T, error>`. On success, `atomically` commits and returns the value. On failure, it rolls back and returns the error; a begin, commit, or rollback error is returned if that step fails. An exception rolls back and propagates.
+`atomically` begins a transaction and passes it to the callback. The callback returns `std::expected<T, std::error_code>`. On success,
+`atomically` commits and returns the value. On failure, it rolls back and returns the error; a begin, commit, or rollback error is returned
+if that step fails. An exception rolls back and propagates.
 
 ```cpp
 auto inserted = rorm::postgres::atomically(
@@ -198,22 +198,22 @@ concept postgres_executor =
         std::same_as<std::remove_cvref_t<T>, postgres::transaction>;
 
 template<postgres_executor Executor, typename Record>
-std::expected<Record, postgres::error> insert( Executor& executor, const Record& record );
+std::expected<Record, std::error_code> insert( Executor& executor, const Record& record );
 
 template<postgres_executor Executor, typename Record>
-std::expected<std::vector<Record>, postgres::error> insert( Executor& executor, std::span<const Record> records );
+std::expected<std::vector<Record>, std::error_code> insert( Executor& executor, std::span<const Record> records );
 
 template<postgres_executor Executor, typename Record>
-std::expected<Record, postgres::error> update( Executor& executor, const Record& record );
+std::expected<Record, std::error_code> update( Executor& executor, const Record& record );
 
 template<postgres_executor Executor, typename Record>
-std::expected<std::vector<Record>, postgres::error> update( Executor& executor, std::span<const Record> records );
+std::expected<std::vector<Record>, std::error_code> update( Executor& executor, std::span<const Record> records );
 
 template<typename Record, postgres_executor Executor, typename Key>
-std::expected<bool, postgres::error> erase( Executor& executor, const Key& primary_key );
+std::expected<bool, std::error_code> erase( Executor& executor, const Key& primary_key );
 
 template<postgres_executor Executor, typename Record>
-std::expected<std::size_t, postgres::error> erase( Executor& executor, std::span<const Record> records );
+std::expected<std::size_t, std::error_code> erase( Executor& executor, std::span<const Record> records );
 
 template<typename Record, typename Member>
 consteval auto field( Member Record::* member );
@@ -283,14 +283,16 @@ template<postgres_executor Executor, typename Query>
 auto fetch( Executor& executor, const Query& query );
 
 template<typename Record, postgres_executor Executor, typename Expression>
-std::expected<std::size_t, postgres::error> count( Executor& executor, Expression expression );
+std::expected<std::size_t, std::error_code> count( Executor& executor, Expression expression );
 
 template<typename Record, postgres_executor Executor, typename Expression>
-std::expected<bool, postgres::error> exists( Executor& executor, Expression expression );
+std::expected<bool, std::error_code> exists( Executor& executor, Expression expression );
 }
 ```
 
-## Usage
+## Planned combined usage
+
+This example combines intended Record/JSON behavior with provisional database APIs; it cannot run against the scaffolds.
 
 ```cpp
 struct UserId
@@ -299,7 +301,7 @@ struct UserId
 };
 
 std::string user_id_to_string( UserId id );
-std::expected<UserId, rorm::conversion_error> user_id_from_string( std::string_view text );
+std::expected<UserId, std::error_code> user_id_from_string( std::string_view text );
 
 enum class UserStatus
 {
@@ -331,7 +333,7 @@ struct [[= rorm::table( "users" )]] User
     Address                   address;
     std::vector<std::string>  roles;
 
-    [[= rorm::json::base64]]
+    [[= rorm::base64]]
     std::vector<unsigned char> avatar;
 
     std::chrono::year_month_day                       birthday;

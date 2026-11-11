@@ -75,6 +75,7 @@ PenaltyReturnTypeOnItsOwnLine: 10
 PointerAlignment: Left
 ReflowComments: false
 RequiresExpressionIndentation: OuterScope
+SeparateDefinitionBlocks: Always
 SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: false

@@ -1,4 +1,6 @@
 /**
+ * @file    rorm.h
+ *
  * Copyright 2025 Aleksandr Ganiukhin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * @file     rorm.h
  * @date     2025-02-24
  *
  * @author   Alexander Ganyukhin (alexander.ganyukhin@orioninc.com)
@@ -22,12 +23,6 @@
 #ifndef RORM_PP__RORM_RORM_H
 #define RORM_PP__RORM_RORM_H
 
-/**
- * @brief      rorm component namespace
- */
-namespace rorm
-{
-
-} // namespace rorm
+#include <rorm/json.h>
 
 #endif /* RORM_PP__RORM_RORM_H */

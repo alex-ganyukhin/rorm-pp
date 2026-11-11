@@ -31,6 +31,7 @@ CMake fetches GoogleTest during configuration. Do not edit or commit generated b
 - Keep public APIs in the `rorm` namespace and preserve the interface-library design unless the change explicitly requires compiled sources.
 - Add or update GoogleTest coverage for behavior changes. Register new test source files in `tests/CMakeLists.txt`.
 - Follow `.clang-format`; format changed C++ files with the standalone `clang-format` installed in the dev container.
+- Follow the [coding style guide](doc/development/coding_style.md).
 - Keep `-Wall -Wextra -Werror` clean. Fix diagnostics rather than weakening the warning policy.
 - Add the repository's Apache-2.0 copyright header to new source, CMake, and script files; see `doc/development/coding_style.md`.
 - Keep changes focused and avoid unrelated edits, especially in generated `build*` directories.

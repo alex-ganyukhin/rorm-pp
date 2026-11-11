@@ -22,6 +22,7 @@ ARG USER_GID=${USER_UID}
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         clang-format \
+        llvm-19-tools \
         cmake \
         gdb \
         ninja-build \

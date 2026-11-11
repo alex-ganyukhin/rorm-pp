@@ -1,4 +1,6 @@
 /**
+ * @file    benchmark_dummy.cc
+ *
  * Copyright 2026 Aleksandr Ganiukhin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

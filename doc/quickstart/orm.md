@@ -25,7 +25,7 @@ int main()
     auto connection = std::move( *connected );
     auto result = rorm::postgres::atomically(
             connection,
-            []( rorm::postgres::transaction& tx ) -> std::expected<void, rorm::postgres::error> {
+            []( rorm::postgres::transaction& tx ) -> std::expected<void, std::error_code> {
                 auto inserted = rorm::insert( tx, Task { .title = "Write report" } );
                 if ( !inserted )
                     return std::unexpected( inserted.error() );
