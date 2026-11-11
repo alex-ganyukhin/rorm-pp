@@ -26,6 +26,8 @@ CMake fetches GoogleTest during configuration. Do not edit or commit generated b
 
 ## Change guidelines
 
+- Follow the [testing guide](doc/development/testing.md) for all new or changed tests.
+
 - When writing or changing documentation, follow [ADR 0002](doc/adr/0002-documentation-policy.md) and the [documentation writing guide](doc/development/documentation.md).
 
 - Keep public APIs in the `rorm` namespace and preserve the interface-library design unless the change explicitly requires compiled sources.

@@ -28,6 +28,7 @@
 // STL
 #include <iostream>
 #include <meta>
+#include <sstream>
 #include <string>
 
 using namespace std::string_literals;
@@ -69,7 +70,10 @@ void serialize_to_ostream( std::ostream& out, T const& obj )
     out << "}";
 }
 
-TEST( TestReflection, Test1 )
+class ReflectionTest : public testing::Test
+{};
+
+TEST_F( ReflectionTest, GIVEN_annotated_field_WHEN_serialized_THEN_annotation_overrides_field_name )
 {
     std::string expected = { R"({"proof": "hello", "i": "220", })" };
 

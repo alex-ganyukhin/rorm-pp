@@ -18,6 +18,7 @@ project(rorm LANGUAGES CXX)
 option(RORM_BUILD_BENCHMARKS "Build rorm benchmarks" OFF)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(compiler)
+include(coverage)
 include(3rd_party/google_test/install_google_test.cmake)
 
 if(RORM_BUILD_BENCHMARKS)

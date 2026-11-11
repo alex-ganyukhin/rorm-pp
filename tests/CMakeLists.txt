@@ -30,6 +30,7 @@ FetchContent_MakeAvailable(nlohmann_json)
 add_executable(
     ${PROJECT_NAME}
     test_reflection.cc
+    test_support.cc
     test_json.cc
 )
 
@@ -37,6 +38,7 @@ target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
     GTest::gtest_main
+    GTest::gmock
     rorm
     rorm_warnings
     nlohmann_json::nlohmann_json

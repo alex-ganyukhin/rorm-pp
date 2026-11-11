@@ -25,6 +25,7 @@ RUN apt-get update \
         llvm-19-tools \
         cmake \
         gdb \
+        gcovr \
         ninja-build \
         sudo \
     && rm -rf /var/lib/apt/lists/* \
