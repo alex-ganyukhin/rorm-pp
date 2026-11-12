@@ -142,4 +142,7 @@ warning-clean tests and public Doxygen gates pass. Branch coverage is the explic
 observations and separate policy-only RED snapshot remain unchecked; neither is claimed retroactively.
 
 Original user plan backup (exact bytes): `/private/tmp/rorm-json-green-original-plan-bdb40fd33ad9.md`, SHA-256
-`bdb40fd33ad98f6fb70700c78286a8b523f8639b36f909e5eb3e6aa7331eed4a`. Original checkout is unchanged pending final review/delivery.
+`bdb40fd33ad98f6fb70700c78286a8b523f8639b36f909e5eb3e6aa7331eed4a`. After scoped review approval, the original local branch
+`4-foundation-milestone` was fast-forwarded to implementation commit
+`3333ed2a912c945defe90130e48760081632bda3`. No changes were pushed. Execution logs and coverage HTML remain under
+`build-worktrees/json-green/` in the original checkout; all unmet gates above remain explicit.
