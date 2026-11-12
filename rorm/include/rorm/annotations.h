@@ -1,8 +1,10 @@
 /**
  * @file    annotations.h
- * Annotation syntax for the planned Record mapping. In `[[= expression]]`, the expression supplies a C++26 annotation value.
- * These scaffolds return tags without retaining names or converters; no consumer applies or validates them yet.
- * Intended mapping rules remain in doc/api.md until implemented.
+ * Reflection-derived Record mapping annotations. In `[[= expression]]`, the expression supplies a C++26 annotation value.
+ * Public nonstatic fields and annotated public accessors define logical properties; private storage is not mapped. A getter and setter
+ * with the same logical name form one property and must agree on the logical type. Either JSON operation validates the complete mapping
+ * at compile time, including duplicate names, invalid accessor signatures, contradictory annotations and incompatible conversions.
+ * Names and converter values are retained by the annotations. PostgreSQL and ORM behavior remains provisional.
  *
  * Copyright 2026 Aleksandr Ganiukhin
  *
@@ -78,9 +80,9 @@ struct conversion_annotation<Shared, To, From>
 };
 
 /**
- * @brief  Declare a logical name shared by all mapping consumers (planned).
+ * @brief  Override a public field or enumerator's logical name.
  *
- * Applies to public fields and enumerators. The scaffold discards the supplied name.
+ * Effective names must be unique within the Record or enum. The supplied text is copied into static storage.
  *
  * @code{.cpp}
  *     struct Profile
@@ -102,22 +104,25 @@ struct ignore_annotation
 {};
 
 /**
- * @brief  Exclude a public field from every consumer's logical properties (planned).
+ * @brief  Exclude a public field from the logical property set.
+ *
+ * Cannot be combined with other mapping annotations. The field is neither emitted nor assigned by JSON.
  *
  * @code{.cpp}
  *     struct Session
  *     {
  *         std::string                    user;
- *         [[= rorm::ignore]] std::string token; // Intended to stay outside the mapping.
+ *         [[= rorm::ignore]] std::string token; // Stays outside the mapping.
  *     };
  * @endcode
  */
 inline constexpr ignore_annotation ignore {};
 
 /**
- * @brief  Declare a readable property on a public const, zero-argument method (planned).
+ * @brief  Declare a readable property on a public const, zero-argument method.
  *
- * The argument names the logical property, independently of the method's C++ name. The scaffold discards it.
+ * The argument names the logical property independently of the method's C++ name. The result must be non-void; reference
+ * results are copied into owning logical values. Getter-only input names are accepted without decoding or assignment.
  *
  * @code{.cpp}
  *     struct Profile
@@ -132,9 +137,11 @@ consteval getter_annotation getter( std::string_view value )
 }
 
 /**
- * @brief  Declare a writable property on a public one-argument method (planned).
+ * @brief  Declare a writable property on a public nonstatic, one-argument method.
  *
- * A getter with the same logical name forms the readable side. A setter alone is write-only. The scaffold discards the name.
+ * A getter with the same logical name forms the readable side. A setter alone is omitted from output, but is required on input
+ * unless its logical type is optional. Getter and setter logical types must agree. The method must be callable on Record&; its return
+ * value is ignored.
  *
  * @code{.cpp}
  *     struct Profile
@@ -150,10 +157,11 @@ consteval setter_annotation setter( std::string_view value )
 }
 
 /**
- * @brief   Declare both conversion directions between a field and its logical type (planned).
+ * @brief   Declare both conversion directions between a field and its logical type.
  *
- * Converters return the destination value or `std::expected<destination, std::error_code>`. Returned errors are intended to pass
- * through unchanged. This scaffold retains only converter types, not their values; no conversion is performed.
+ * Converters return the destination value or `std::expected<destination, std::error_code>`. Their values are retained and returned errors
+ * pass through unchanged, including category and value. Converter exceptions propagate. Both directions are checked at compile time,
+ * even when only one JSON operation is used. Use this annotation to impose stricter numeric conversion than normal floating-point rounding.
  *
  * @code{.cpp}
  *     struct UserId
@@ -176,9 +184,10 @@ consteval auto as( ToShared to, FromShared from )
 }
 
 /**
- * @brief   Declare a getter's stored-to-logical or a setter's logical-to-stored conversion (planned).
+ * @brief   Declare a getter's stored-to-logical or a setter's logical-to-stored conversion.
  *
- * Uses the same converter result convention as the two-converter overload. This scaffold does not retain or invoke the converter.
+ * Uses the same converter result and exception convention as the two-converter overload. The annotated accessor determines direction;
+ * the converter must accept the stored getter value or logical setter value respectively.
  *
  * @code{.cpp}
  *     struct UserId
@@ -212,7 +221,7 @@ struct primary_key_annotation
 /**
  * @brief  Identify the single primary key for ORM operations (planned).
  *
- * Applies to public fields and accessors. JSON is intended to treat this as an ordinary property.
+ * Applies to public fields and accessors. JSON treats this as an ordinary property; ORM operations remain unimplemented.
  *
  * @code{.cpp}
  *     struct Profile
@@ -233,7 +242,7 @@ struct generated_annotation
 /**
  * @brief  Omit an ORM property from writes and retrieve its generated value (planned).
  *
- * Applies to public fields and accessors. JSON is intended to treat this as an ordinary property.
+ * Applies to public fields and accessors. JSON treats this as an ordinary property; ORM operations remain unimplemented.
  *
  * @code{.cpp}
  *     struct Profile
@@ -257,7 +266,7 @@ struct table_annotation
 /**
  * @brief  Declare the table name for typed ORM operations (planned).
  *
- * Applies to a Record type. This scaffold discards the name; the PostgreSQL and ORM APIs remain provisional.
+ * Applies to a Record type and retains the name in static storage. The PostgreSQL and ORM APIs remain provisional; JSON ignores this tag.
  *
  * @code{.cpp}
  *     struct[[= rorm::table( "profiles" )]] Profile
@@ -279,9 +288,13 @@ struct base64_annotation
 {};
 
 /**
- * @brief  Request a base64 string representation for a byte-like property (planned).
+ * @brief  Use standard padded base64 for a logical byte sequence.
  *
- * Applies to byte-like fields and accessors. Without this annotation, JSON is intended to use an integer array.
+ * Applies to fields and accessors whose logical type, after any rorm::as conversion, is a vector or array of std::byte or unsigned 8-bit
+ * elements, optionally wrapped in std::optional. On paired accessors either direction can supply the tag. Without it JSON uses
+ * integer arrays.
+ * Empty sequences use an empty string; missing or null optional values remain disengaged. Malformed alphabet, length, padding or unused
+ * trailing bits return incompatible_value, as does a decoded length that disagrees with a fixed array.
  *
  * @code{.cpp}
  *     struct Profile

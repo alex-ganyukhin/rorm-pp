@@ -1,14 +1,9 @@
 # JSON quickstart
 
-> [!NOTE]
-> The Record and JSON interfaces are present as dummy scaffolds for the API/red-test phase.
-> `to_json` returns an empty string and `from_json` returns a default object. They do not exchange JSON yet.
-> The workflow and features below describe intended behavior.
-
 ## Scenario: accept and return a profile
 
 Define an ordinary C++ type. Its public fields become JSON properties; no registration or base class is needed. Parse an incoming profile,
-change it, and serialize the result. This example illustrates the planned workflow:
+change it, and serialize the result. This example parses a profile, increments its visit count, and returns JSON:
 
 ```cpp
 #include <rorm/rorm.h>
@@ -40,8 +35,8 @@ int main()
 }
 ```
 
-The unknown-member policy is required on every `from_json` call. Use `reject` to catch unexpected input or `ignore` when extra members are
-acceptable. Missing writable properties are allowed only when they are optional.
+The unknown-member policy is required on every `from_json` call. Pass `{}` to catch unexpected input or
+`{ .ignore_unknown_members = true }` when extra members are acceptable. Missing writable properties are allowed only when they are optional.
 
 Extended features:
 
@@ -57,5 +52,5 @@ Extended features:
 - `rorm::base64`: Encode bytes as a string.
 - JSON errors: Inspect the error code and its category message.
 
-See the [planned mapping contract](../api.md#planned-record-mapping) and the local API examples in
+See the contracts and local API examples in
 [`<rorm/annotations.h>`](../../rorm/include/rorm/annotations.h) and [`<rorm/json.h>`](../../rorm/include/rorm/json.h).
