@@ -57,3 +57,13 @@ Do not pass property_descriptor itself as NTTP or use descriptor objects at runt
 Reflection-native mapping and nlohmann-independent reusable code preserved. Header-only target and existing error category preserved.
 Policy migration and timestamp expansion are intentional approved contract changes. No performance claim or dependency upgrade introduced.
 Runtime coverage and public documentation gates remain pending final acceptance; compile failures are evidence separate from runtime counters.
+
+## Integration preparation
+
+- Parser commit `9520996` reviewed PASS and integrated as `57edda5`.
+- Value commit `df98663` integrated as `a35d511`; independent review pending.
+- Foundation review found missing duplicate-conversion and `ignore` plus key/generated validation.
+- Three focused compile-fail fixtures observed RED because invalid mappings compiled, then GREEN after shared mapping fix.
+- Full mapping/positive focused gate: 20/20 passed (includes four existing mapping runtime cases).
+- Separate `[[= ...]]` annotation lists are required by GCC; initial invalid fixture syntax was corrected before authoritative RED run.
+- No whole-feature refactor has begun; codecs and full GREEN remain pending.

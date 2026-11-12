@@ -67,13 +67,18 @@ consteval A annotation( std::meta::info m )
 
 consteval std::meta::info conversion_of( std::meta::info m )
 {
+    std::meta::info result {};
     for ( auto a : std::meta::annotations_of( m ) )
     {
         auto t = std::meta::type_of( a );
         if ( std::meta::has_template_arguments( t ) && std::meta::template_of( t ) == ^^conversion_annotation )
-            return a;
+        {
+            if ( result != std::meta::info {} )
+                throw "duplicate mapping annotation: conversion";
+            result = a;
+        }
     }
-    return {};
+    return result;
 }
 
 consteval std::string_view logical_name( std::meta::info m )
@@ -306,7 +311,9 @@ struct record_mapping
                     {
                         static_assert( !has_annotation<name_annotation>( m ) && !get && !set &&
                                                conversion_of( m ) == std::meta::info {} &&
-                                               !has_annotation<base64_annotation>( m ),
+                                               !has_annotation<base64_annotation>( m ) &&
+                                               !has_annotation<primary_key_annotation>( m ) &&
+                                               !has_annotation<generated_annotation>( m ),
                                        "ignore conflicts with mapping annotations" );
                     }
                     else
