@@ -233,6 +233,12 @@ std::expected<Chrono, std::error_code> parse_chrono( std::string_view text )
         const chrono_integer seconds =
                 duration_cast<std::chrono::seconds>( sys_days( *date ).time_since_epoch() ).count() + hour * 3600 +
                 minute * 60 + second - offset;
+        constexpr auto minimum =
+                duration_cast<std::chrono::seconds>( sys_days( year( 0 ) / January / 1 ).time_since_epoch() ).count();
+        constexpr auto maximum =
+                duration_cast<std::chrono::seconds>( sys_days( year( 10000 ) / January / 1 ).time_since_epoch() ).count();
+        if ( seconds < minimum || seconds >= maximum )
+            return range;
         constexpr chrono_integer numerator      = Period::num;
         constexpr chrono_integer denominator    = Period::den;
         const auto               scaled_seconds = seconds * denominator;
@@ -253,11 +259,7 @@ std::expected<Chrono, std::error_code> parse_chrono( std::string_view text )
         if ( lower < static_cast<chrono_integer>( std::numeric_limits<Rep>::min() ) ||
              lower > static_cast<chrono_integer>( std::numeric_limits<Rep>::max() ) )
             return range;
-        const auto     rounded_seconds = chrono_floor( lower * numerator, denominator );
-        constexpr auto minimum =
-                duration_cast<std::chrono::seconds>( sys_days( year( 0 ) / January / 1 ).time_since_epoch() ).count();
-        constexpr auto maximum =
-                duration_cast<std::chrono::seconds>( sys_days( year( 10000 ) / January / 1 ).time_since_epoch() ).count();
+        const auto rounded_seconds = chrono_floor( lower * numerator, denominator );
         if ( rounded_seconds < minimum || rounded_seconds >= maximum )
             return range;
         return Chrono( D( static_cast<Rep>( lower ) ) );

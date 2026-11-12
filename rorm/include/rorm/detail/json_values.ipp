@@ -48,7 +48,12 @@ std::expected<json_value, std::error_code> encode_value( const T& value, bool ba
     {
         if ( !std::isfinite( value ) )
             return std::unexpected( make_error_code( json_error_code::incompatible_value ) );
-        return json_value( value );
+        if ( value > std::numeric_limits<double>::max() || value < std::numeric_limits<double>::lowest() )
+            return std::unexpected( make_error_code( json_error_code::out_of_range ) );
+        auto narrowed = static_cast<double>( value );
+        if ( value != 0 && narrowed == 0 )
+            return std::unexpected( make_error_code( json_error_code::out_of_range ) );
+        return json_value( narrowed );
     }
     else if constexpr ( std::is_enum_v<T> )
     {

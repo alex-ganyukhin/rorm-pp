@@ -255,4 +255,14 @@ TEST_F( JsonCodecs, WHEN_calendar_or_unsigned_representation_is_exceeded_THEN_ra
     ASSERT_FALSE( negative );
     EXPECT_EQ( negative.error(), rorm::make_error_code( rorm::json_error_code::out_of_range ) );
 }
+
+TEST_F( JsonCodecs, WHEN_offset_leaves_calendar_before_rounding_THEN_range_error_is_returned )
+{
+    for ( auto text : { "0000-01-01T00:00:00+00:01", "9999-12-31T23:59:59-00:01" } )
+    {
+        const auto result = parse_ticks<std::chrono::days>( text );
+        ASSERT_FALSE( result );
+        EXPECT_EQ( result.error(), rorm::make_error_code( rorm::json_error_code::out_of_range ) );
+    }
+}
 } // namespace

@@ -67,3 +67,14 @@ Runtime coverage and public documentation gates remain pending final acceptance;
 - Full mapping/positive focused gate: 20/20 passed (includes four existing mapping runtime cases).
 - Separate `[[= ...]]` annotation lists are required by GCC; initial invalid fixture syntax was corrected before authoritative RED run.
 - No whole-feature refactor has begun; codecs and full GREEN remain pending.
+
+## G5 combined GREEN
+
+- Codecs `9db8583` integrated as `646bd1e`; all three worker streams now integrated.
+- Independent value review found finite long-double output could narrow to null/zero. Focused regression observed RED, then checked
+  double narrowing returns `out_of_range` for overflow/underflow-to-zero and preserves `incompatible_value` for nonfinite source values.
+- Independent codec review found out-of-calendar UTC input could round back into range. Focused regression observed RED; both normalized
+  source calendar and rounded destination calendar are now checked.
+- Complete fresh serial warning-clean build/test after both fixes: **122/122 PASS**. Original RED assertions remain intact.
+- An earlier intermediate regression run overlapped test rebuilding; it is discarded as acceptance evidence. The fresh serial log
+  `review-fixes-tests.log` is authoritative.

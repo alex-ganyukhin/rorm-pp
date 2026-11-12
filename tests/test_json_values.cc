@@ -56,6 +56,18 @@ TEST_F( JsonValuesTest, WHEN_subnormal_is_read_THEN_it_is_preserved )
     EXPECT_EQ( result->value, std::numeric_limits<float>::denorm_min() );
 }
 
+TEST_F( JsonValuesTest, WHEN_wide_float_exceeds_backend_range_THEN_range_error_is_returned )
+{
+    for ( auto value : { std::numeric_limits<long double>::max(),
+                         -std::numeric_limits<long double>::max(),
+                         std::numeric_limits<long double>::denorm_min() } )
+    {
+        auto result = rorm::to_json( ValueRecord<long double> { value } );
+        ASSERT_FALSE( result );
+        EXPECT_EQ( result.error(), rorm::make_error_code( rorm::json_error_code::out_of_range ) );
+    }
+}
+
 TEST_F( JsonValuesTest, WHEN_stored_text_is_invalid_utf8_THEN_encoding_fails )
 {
     auto result = rorm::to_json( ValueRecord<std::string> { std::string( 1, '\xff' ) } );
