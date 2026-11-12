@@ -136,4 +136,28 @@ TEST_F( JsonValuesTest, WHEN_later_nested_element_fails_THEN_no_partial_record_i
     ASSERT_FALSE( result );
     EXPECT_EQ( result.error(), rorm::make_error_code( rorm::json_error_code::missing_property ) );
 }
+
+TEST_F( JsonValuesTest, WHEN_later_sequence_output_is_nonfinite_THEN_no_partial_json_is_returned )
+{
+    auto result = rorm::to_json( ValueRecord<std::vector<double>> {
+            { 1.0, std::numeric_limits<double>::infinity() }
+    } );
+    ASSERT_FALSE( result );
+    EXPECT_EQ( result.error(), rorm::make_error_code( rorm::json_error_code::incompatible_value ) );
+}
+
+TEST_F( JsonValuesTest, WHEN_engaged_optional_has_wrong_type_THEN_decode_error_is_returned )
+{
+    auto result = rorm::from_json<ValueRecord<std::optional<int>>>( R"({"value":"bad"})", {} );
+    ASSERT_FALSE( result );
+    EXPECT_EQ( result.error(), rorm::make_error_code( rorm::json_error_code::incompatible_value ) );
+}
+
+TEST_F( JsonValuesTest, WHEN_invalid_calendar_is_encoded_in_record_THEN_error_is_propagated )
+{
+    using namespace std::chrono;
+    auto result = rorm::to_json( ValueRecord<year_month_day> { year( 2023 ) / February / 29 } );
+    ASSERT_FALSE( result );
+    EXPECT_EQ( result.error(), rorm::make_error_code( rorm::json_error_code::incompatible_value ) );
+}
 } // namespace rorm_test

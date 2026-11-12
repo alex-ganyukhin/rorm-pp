@@ -31,7 +31,12 @@ inline chrono_integer chrono_floor( chrono_integer numerator, chrono_integer den
     return quotient;
 }
 
-// Compare the borrowed decimal fraction to a rational without bounding its digit count.
+/**
+ * @brief  Compare a validated borrowed decimal fraction with a rational without bounding the digit count.
+ *
+ * fraction contains only decimal digits and represents a nonnegative value below one; denominator is positive.
+ * Calendar/ratio bounds keep each remainder-times-ten operation within chrono_integer.
+ */
 inline int compare_chrono_fraction( std::string_view fraction, chrono_integer numerator, chrono_integer denominator )
 {
     if ( numerator < 0 )

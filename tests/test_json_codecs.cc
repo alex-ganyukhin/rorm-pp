@@ -265,4 +265,15 @@ TEST_F( JsonCodecs, WHEN_offset_leaves_calendar_before_rounding_THEN_range_error
         EXPECT_EQ( result.error(), rorm::make_error_code( rorm::json_error_code::out_of_range ) );
     }
 }
+
+TEST_F( JsonCodecs, WHEN_base64_uses_full_alphabet_THEN_byte_values_are_preserved )
+{
+    const std::vector<unsigned char> bytes { 251, 255, 255 };
+    auto                             encoded = rorm::detail::encode_base64( bytes );
+    ASSERT_TRUE( encoded );
+    EXPECT_EQ( *encoded, "+///" );
+    auto decoded = rorm::detail::decode_base64<std::vector<unsigned char>>( *encoded );
+    ASSERT_TRUE( decoded );
+    EXPECT_EQ( *decoded, bytes );
+}
 } // namespace

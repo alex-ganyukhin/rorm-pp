@@ -210,9 +210,15 @@ struct member_mapping
                 }
             }
             else if constexpr ( get )
+            {
+                static_assert( conversion_traits<C>::count == 1, "accessor conversion requires one converter" );
                 static_assert( valid_converter<decltype( c.first ), stored_type, logical_type>(), "convert getter" );
+            }
             else
+            {
+                static_assert( conversion_traits<C>::count == 1, "accessor conversion requires one converter" );
                 static_assert( valid_converter<decltype( c.first ), logical_type, stored_type>(), "convert setter" );
+            }
         }
         return true;
     }
@@ -282,6 +288,11 @@ struct member_mapping
     }
 };
 
+/**
+ * @brief  Typed operations for one logical property; a null reflection denotes an absent direction.
+ *
+ * Reads return owning normalized values. Reader and writer metadata must come from the same validated Record mapping.
+ */
 template<typename R, std::meta::info Reader, std::meta::info Writer>
 struct mapped_property
 {
