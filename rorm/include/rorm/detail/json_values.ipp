@@ -21,23 +21,6 @@
 
 namespace rorm::detail {
 template<typename T>
-struct enum_mapping
-{
-    static constexpr auto enumerators = std::define_static_array( std::meta::enumerators_of( ^^T ) );
-
-    static consteval bool validate()
-    {
-        for ( std::size_t i = 0; i < enumerators.size(); ++i )
-            for ( std::size_t j = 0; j < i; ++j )
-                if ( logical_name( enumerators[i] ) == logical_name( enumerators[j] ) )
-                    return false;
-        return true;
-    }
-
-    static_assert( validate(), "rorm: duplicate effective enum name" );
-};
-
-template<typename T>
 std::expected<json_value, std::error_code> encode_value( const T& value, bool base64 )
 {
     if constexpr ( std::is_same_v<T, std::string> || std::is_integral_v<T> )

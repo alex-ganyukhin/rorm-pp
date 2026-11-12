@@ -78,3 +78,12 @@ Runtime coverage and public documentation gates remain pending final acceptance;
 - Complete fresh serial warning-clean build/test after both fixes: **122/122 PASS**. Original RED assertions remain intact.
 - An earlier intermediate regression run overlapped test rebuilding; it is discarded as acceptance evidence. The fresh serial log
   `review-fixes-tests.log` is authoritative.
+
+## R1–R2 refactor
+
+- Moved backend-independent enum metadata/duplicate-name validation from JSON dispatcher into shared Record mapping.
+- Existing owning member reads and converter-result normalization already have one implementation; no reference wrapper or extra abstraction
+  added. Required-property and unknown-member handling each have one owner; numeric signed/unsigned/float checks have distinct semantics.
+- Inspected backend fragments: no temporary scaffolds or generic runtime fallback remain. Recursive value handling stays centralized,
+  text codecs stay separate, and the strict SAX prevalidation pass remains. No backend replacement or performance claim.
+- Standalone clang-format applied; complete post-refactor suite **122/122 PASS**, warning-clean build.

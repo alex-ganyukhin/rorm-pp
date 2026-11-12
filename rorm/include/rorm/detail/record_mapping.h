@@ -101,6 +101,23 @@ consteval std::string_view logical_name( std::meta::info m )
     return std::meta::identifier_of( m );
 }
 
+template<typename T>
+struct enum_mapping
+{
+    static constexpr auto enumerators = std::define_static_array( std::meta::enumerators_of( ^^T ) );
+
+    static consteval bool validate()
+    {
+        for ( std::size_t i = 0; i < enumerators.size(); ++i )
+            for ( std::size_t j = 0; j < i; ++j )
+                if ( logical_name( enumerators[i] ) == logical_name( enumerators[j] ) )
+                    return false;
+        return true;
+    }
+
+    static_assert( validate(), "rorm: duplicate effective enum name" );
+};
+
 /** @brief Compile-time metadata only; reflections must never escape into runtime storage. */
 struct property_descriptor
 {
